@@ -1,0 +1,593 @@
+/**
+ * SEOMelon Admin Styles
+ *
+ * Kept intentionally minimal to blend with the WordPress admin UI.
+ * Uses native WordPress classes where possible and supplements with
+ * SEOMelon-specific styles for scores, badges, cards, and layout.
+ *
+ * @package SEOMelon
+ */
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+.seomelon-wrap {
+	max-width: 1400px;
+}
+
+.seomelon-logo {
+	font-size: 1.2em;
+	margin-right: 4px;
+}
+
+/* ==========================================================================
+   Stats Bar
+   ========================================================================== */
+
+.seomelon-stats-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin: 20px 0;
+}
+
+.seomelon-stat-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 12px 20px;
+	min-width: 120px;
+	text-align: center;
+}
+
+.seomelon-stat-label {
+	display: block;
+	font-size: 11px;
+	color: #646970;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 4px;
+}
+
+.seomelon-stat-value {
+	display: block;
+	font-size: 20px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.seomelon-text-green {
+	color: #00a32a;
+}
+
+.seomelon-text-red {
+	color: #d63638;
+}
+
+/* ==========================================================================
+   Score Badges
+   ========================================================================== */
+
+.seomelon-score-badge {
+	display: inline-block;
+	min-width: 32px;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+	text-align: center;
+	line-height: 1.6;
+}
+
+.seomelon-score-good {
+	background: #d4edda;
+	color: #155724;
+}
+
+.seomelon-score-ok {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.seomelon-score-poor {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.seomelon-score-none {
+	background: #f0f0f1;
+	color: #8c8f94;
+}
+
+.seomelon-score-large {
+	font-size: 18px;
+	padding: 4px 16px;
+	border-radius: 16px;
+}
+
+/* ==========================================================================
+   Badges (Status, Category)
+   ========================================================================== */
+
+.seomelon-badge {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.seomelon-badge-green {
+	background: #d4edda;
+	color: #155724;
+}
+
+.seomelon-badge-blue {
+	background: #cce5ff;
+	color: #004085;
+}
+
+.seomelon-badge-red {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.seomelon-badge-grey {
+	background: #f0f0f1;
+	color: #646970;
+}
+
+/* ==========================================================================
+   Bulk Actions Bar
+   ========================================================================== */
+
+.seomelon-bulk-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 16px 0;
+	padding: 12px 16px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+}
+
+.seomelon-bulk-actions .button .dashicons {
+	font-size: 16px;
+	line-height: 1.7;
+	width: 16px;
+	height: 16px;
+	margin-right: 2px;
+}
+
+.seomelon-status-message {
+	font-size: 13px;
+	margin-left: 8px;
+}
+
+.seomelon-status-message.success {
+	color: #00a32a;
+}
+
+.seomelon-status-message.error {
+	color: #d63638;
+}
+
+/* ==========================================================================
+   Content Tabs
+   ========================================================================== */
+
+.seomelon-tabs .nav-tab {
+	cursor: pointer;
+}
+
+.seomelon-tab-count {
+	display: inline-block;
+	min-width: 18px;
+	padding: 0 6px;
+	border-radius: 9px;
+	background: #dcdcde;
+	color: #50575e;
+	font-size: 11px;
+	font-weight: 600;
+	text-align: center;
+	line-height: 18px;
+	margin-left: 4px;
+}
+
+.nav-tab-active .seomelon-tab-count {
+	background: #2271b1;
+	color: #fff;
+}
+
+/* ==========================================================================
+   Content Table
+   ========================================================================== */
+
+#seomelon-content-table .column-score,
+#seomelon-content-table .column-status,
+#seomelon-content-table .column-type {
+	width: 100px;
+}
+
+#seomelon-content-table .column-actions {
+	width: 180px;
+}
+
+#seomelon-content-table .column-actions .button {
+	margin-right: 4px;
+}
+
+/* ==========================================================================
+   Settings
+   ========================================================================== */
+
+.seomelon-settings-grid {
+	display: grid;
+	gap: 20px;
+}
+
+.seomelon-settings-section {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 20px;
+}
+
+.seomelon-settings-section h2 {
+	margin-top: 0;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.seomelon-input-group {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.seomelon-input-group .button {
+	padding: 3px 8px;
+	min-height: 30px;
+}
+
+.seomelon-input-group .dashicons {
+	font-size: 18px;
+	line-height: 1.4;
+}
+
+/* ==========================================================================
+   Insights Grid
+   ========================================================================== */
+
+.seomelon-insights-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+	gap: 16px;
+	margin-top: 20px;
+}
+
+.seomelon-insight-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 16px;
+	transition: box-shadow 0.2s;
+}
+
+.seomelon-insight-card:hover {
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.seomelon-insight-card.seomelon-hidden {
+	display: none;
+}
+
+.seomelon-insight-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.seomelon-insight-category {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.seomelon-cat-quickwins {
+	background: #d4edda;
+	color: #155724;
+}
+
+.seomelon-cat-keywords {
+	background: #cce5ff;
+	color: #004085;
+}
+
+.seomelon-cat-catalog {
+	background: #e2d5f1;
+	color: #4a1a7a;
+}
+
+.seomelon-cat-promotions {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.seomelon-cat-seasonal {
+	background: #fce4ec;
+	color: #880e4f;
+}
+
+.seomelon-cat-general {
+	background: #f0f0f1;
+	color: #646970;
+}
+
+.seomelon-insight-priority {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.seomelon-priority-high {
+	color: #d63638;
+}
+
+.seomelon-priority-medium {
+	color: #dba617;
+}
+
+.seomelon-priority-low {
+	color: #646970;
+}
+
+.seomelon-insight-title {
+	font-size: 14px;
+	margin: 0 0 8px 0;
+}
+
+.seomelon-insight-description {
+	color: #50575e;
+	font-size: 13px;
+	margin: 0 0 10px 0;
+}
+
+.seomelon-insight-action {
+	background: #f6f7f7;
+	border-left: 3px solid #2271b1;
+	padding: 8px 12px;
+	margin: 10px 0;
+	font-size: 13px;
+}
+
+.seomelon-insight-keywords,
+.seomelon-insight-products {
+	margin: 8px 0;
+	font-size: 13px;
+}
+
+.seomelon-insight-confidence {
+	font-size: 12px;
+	color: #646970;
+	margin-top: 8px;
+}
+
+.seomelon-keyword-tag {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	background: #f0f0f1;
+	color: #50575e;
+	font-size: 12px;
+	margin: 2px;
+}
+
+/* ==========================================================================
+   Content Detail
+   ========================================================================== */
+
+.seomelon-back-link {
+	text-decoration: none;
+	font-size: 14px;
+}
+
+.seomelon-detail-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 16px 0;
+	padding: 12px 16px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+}
+
+.seomelon-detail-meta {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.seomelon-detail-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.seomelon-detail-actions .dashicons {
+	font-size: 16px;
+	line-height: 1.7;
+	width: 16px;
+	height: 16px;
+	margin-right: 2px;
+}
+
+.seomelon-detail-issues {
+	background: #fcf0f1;
+	border: 1px solid #f8d7da;
+	border-left: 4px solid #d63638;
+	border-radius: 4px;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+}
+
+.seomelon-detail-issues h3 {
+	margin: 0 0 8px 0;
+	color: #721c24;
+	font-size: 13px;
+}
+
+.seomelon-detail-issues ul {
+	margin: 0;
+	padding-left: 20px;
+}
+
+.seomelon-detail-issues li {
+	color: #721c24;
+	font-size: 13px;
+}
+
+.seomelon-detail-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-top: 16px;
+}
+
+.seomelon-detail-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 16px;
+}
+
+.seomelon-detail-card h3 {
+	margin-top: 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.seomelon-detail-card-full {
+	grid-column: 1 / -1;
+}
+
+.seomelon-comparison {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+}
+
+.seomelon-current label,
+.seomelon-suggested label {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: #646970;
+	margin-bottom: 4px;
+}
+
+.seomelon-current p {
+	color: #8c8f94;
+}
+
+.seomelon-suggested p {
+	color: #1d2327;
+	font-weight: 500;
+}
+
+.seomelon-faq-list dt {
+	font-weight: 600;
+	margin-top: 12px;
+}
+
+.seomelon-faq-list dd {
+	margin-left: 0;
+	color: #50575e;
+}
+
+/* ==========================================================================
+   Progress Modal
+   ========================================================================== */
+
+.seomelon-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.seomelon-modal-content {
+	background: #fff;
+	border-radius: 8px;
+	padding: 30px 40px;
+	max-width: 500px;
+	width: 100%;
+	text-align: center;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.seomelon-progress-bar {
+	height: 20px;
+	background: #f0f0f1;
+	border-radius: 10px;
+	overflow: hidden;
+	margin: 20px 0;
+}
+
+.seomelon-progress-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #00a32a, #2271b1);
+	border-radius: 10px;
+	transition: width 0.3s ease;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media screen and (max-width: 782px) {
+	.seomelon-stats-bar {
+		flex-direction: column;
+	}
+
+	.seomelon-stat-card {
+		min-width: auto;
+	}
+
+	.seomelon-bulk-actions {
+		flex-wrap: wrap;
+	}
+
+	.seomelon-insights-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.seomelon-detail-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.seomelon-comparison {
+		grid-template-columns: 1fr;
+	}
+
+	.seomelon-detail-header {
+		flex-direction: column;
+		gap: 12px;
+	}
+}
