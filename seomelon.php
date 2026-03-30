@@ -39,6 +39,7 @@ require_once SEOMELON_PLUGIN_DIR . 'includes/class-seomelon-sync.php';
 require_once SEOMELON_PLUGIN_DIR . 'includes/class-seomelon-apply.php';
 require_once SEOMELON_PLUGIN_DIR . 'includes/class-seomelon-seo-detect.php';
 require_once SEOMELON_PLUGIN_DIR . 'includes/class-seomelon-columns.php';
+require_once SEOMELON_PLUGIN_DIR . 'includes/class-seomelon-metabox.php';
 
 /**
  * Activation hook.

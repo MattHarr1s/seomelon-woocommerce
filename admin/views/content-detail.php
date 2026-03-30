@@ -130,14 +130,22 @@ $platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 					</div>
 					<?php if ( ! empty( $suggestions['meta_title'] ) ) : ?>
 						<div class="seomelon-suggested">
-							<label><?php esc_html_e( 'Suggested', 'seomelon' ); ?></label>
-							<p><?php echo esc_html( $suggestions['meta_title'] ); ?></p>
+							<label for="seomelon-edit-meta-title"><?php esc_html_e( 'Suggested', 'seomelon' ); ?></label>
+							<input type="text"
+								id="seomelon-edit-meta-title"
+								class="seomelon-edit-field"
+								value="<?php echo esc_attr( $suggestions['meta_title'] ); ?>"
+								data-max-length="60"
+								data-min-length="30"
+								maxlength="70"
+								aria-describedby="seomelon-charcount-meta-title"
+							/>
 							<?php
 							$sug_title_len = mb_strlen( $suggestions['meta_title'] );
 							$sug_class     = ( $sug_title_len >= 30 && $sug_title_len <= 60 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
 							?>
-							<span class="seomelon-charcount <?php echo esc_attr( $sug_class ); ?>">
-								<?php echo esc_html( $sug_title_len ); ?>/60 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+							<span id="seomelon-charcount-meta-title" class="seomelon-charcount <?php echo esc_attr( $sug_class ); ?>">
+								<span class="seomelon-charcount-num"><?php echo esc_html( $sug_title_len ); ?></span>/60 <?php esc_html_e( 'chars', 'seomelon' ); ?>
 							</span>
 						</div>
 					<?php endif; ?>
@@ -161,14 +169,22 @@ $platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 					</div>
 					<?php if ( ! empty( $suggestions['meta_description'] ) ) : ?>
 						<div class="seomelon-suggested">
-							<label><?php esc_html_e( 'Suggested', 'seomelon' ); ?></label>
-							<p><?php echo esc_html( $suggestions['meta_description'] ); ?></p>
+							<label for="seomelon-edit-meta-description"><?php esc_html_e( 'Suggested', 'seomelon' ); ?></label>
+							<textarea
+								id="seomelon-edit-meta-description"
+								class="seomelon-edit-field"
+								data-max-length="160"
+								data-min-length="70"
+								maxlength="170"
+								rows="3"
+								aria-describedby="seomelon-charcount-meta-description"
+							><?php echo esc_textarea( $suggestions['meta_description'] ); ?></textarea>
 							<?php
 							$sug_desc_len = mb_strlen( $suggestions['meta_description'] );
 							$sug_d_class  = ( $sug_desc_len >= 70 && $sug_desc_len <= 160 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
 							?>
-							<span class="seomelon-charcount <?php echo esc_attr( $sug_d_class ); ?>">
-								<?php echo esc_html( $sug_desc_len ); ?>/160 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+							<span id="seomelon-charcount-meta-description" class="seomelon-charcount <?php echo esc_attr( $sug_d_class ); ?>">
+								<span class="seomelon-charcount-num"><?php echo esc_html( $sug_desc_len ); ?></span>/160 <?php esc_html_e( 'chars', 'seomelon' ); ?>
 							</span>
 						</div>
 					<?php endif; ?>
@@ -180,7 +196,7 @@ $platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 				<div class="seomelon-detail-card seomelon-detail-card-full">
 					<h3><?php esc_html_e( 'Google Search Preview', 'seomelon' ); ?></h3>
 					<div class="seomelon-serp-preview">
-						<div class="seomelon-serp-title">
+						<div class="seomelon-serp-title" id="seomelon-serp-title">
 							<?php echo esc_html( mb_substr( $suggestions['meta_title'], 0, 60 ) ); ?>
 						</div>
 						<div class="seomelon-serp-url">
@@ -192,7 +208,7 @@ $platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 							echo esc_html( $url ?: home_url( '/' . ( $item['handle'] ?? '' ) ) );
 							?>
 						</div>
-						<div class="seomelon-serp-description">
+						<div class="seomelon-serp-description" id="seomelon-serp-description">
 							<?php echo esc_html( mb_substr( $suggestions['meta_description'], 0, 160 ) ); ?>
 						</div>
 					</div>
@@ -202,8 +218,23 @@ $platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 			<!-- AEO Description -->
 			<?php if ( ! empty( $suggestions['aeo_description'] ) ) : ?>
 				<div class="seomelon-detail-card seomelon-detail-card-full">
-					<h3><?php esc_html_e( 'AEO Description (Answer Engine Optimization)', 'seomelon' ); ?></h3>
-					<p><?php echo esc_html( $suggestions['aeo_description'] ); ?></p>
+					<h3><label for="seomelon-edit-aeo-description"><?php esc_html_e( 'AEO Description (Answer Engine Optimization)', 'seomelon' ); ?></label></h3>
+					<textarea
+						id="seomelon-edit-aeo-description"
+						class="seomelon-edit-field seomelon-edit-field-wide"
+						data-max-length="500"
+						data-min-length="50"
+						maxlength="600"
+						rows="4"
+						aria-describedby="seomelon-charcount-aeo-description"
+					><?php echo esc_textarea( $suggestions['aeo_description'] ); ?></textarea>
+					<?php
+					$sug_aeo_len = mb_strlen( $suggestions['aeo_description'] );
+					$aeo_class   = ( $sug_aeo_len >= 50 && $sug_aeo_len <= 500 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+					?>
+					<span id="seomelon-charcount-aeo-description" class="seomelon-charcount <?php echo esc_attr( $aeo_class ); ?>">
+						<span class="seomelon-charcount-num"><?php echo esc_html( $sug_aeo_len ); ?></span>/500 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+					</span>
 				</div>
 			<?php endif; ?>
 
@@ -216,29 +247,53 @@ $platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 							<div class="seomelon-social-domain">
 								<?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ); ?>
 							</div>
-							<div class="seomelon-social-title">
+							<div class="seomelon-social-title" id="seomelon-social-title">
 								<?php echo esc_html( $suggestions['og_title'] ?? $suggestions['meta_title'] ?? '' ); ?>
 							</div>
-							<div class="seomelon-social-desc">
+							<div class="seomelon-social-desc" id="seomelon-social-desc">
 								<?php echo esc_html( $suggestions['og_description'] ?? $suggestions['meta_description'] ?? '' ); ?>
 							</div>
 						</div>
 					</div>
 					<?php if ( ! empty( $suggestions['og_title'] ) ) : ?>
-						<div style="margin-top: 12px;">
-							<strong><?php esc_html_e( 'OG Title:', 'seomelon' ); ?></strong>
-							<?php echo esc_html( $suggestions['og_title'] ); ?>
-							<span class="seomelon-charcount seomelon-charcount-ok">
-								<?php echo esc_html( mb_strlen( $suggestions['og_title'] ) ); ?>/60
+						<div class="seomelon-og-field-group">
+							<label for="seomelon-edit-og-title"><strong><?php esc_html_e( 'OG Title:', 'seomelon' ); ?></strong></label>
+							<input type="text"
+								id="seomelon-edit-og-title"
+								class="seomelon-edit-field"
+								value="<?php echo esc_attr( $suggestions['og_title'] ); ?>"
+								data-max-length="60"
+								data-min-length="15"
+								maxlength="70"
+								aria-describedby="seomelon-charcount-og-title"
+							/>
+							<?php
+							$sug_og_title_len = mb_strlen( $suggestions['og_title'] );
+							$og_title_class   = ( $sug_og_title_len >= 15 && $sug_og_title_len <= 60 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+							?>
+							<span id="seomelon-charcount-og-title" class="seomelon-charcount <?php echo esc_attr( $og_title_class ); ?>">
+								<span class="seomelon-charcount-num"><?php echo esc_html( $sug_og_title_len ); ?></span>/60 <?php esc_html_e( 'chars', 'seomelon' ); ?>
 							</span>
 						</div>
 					<?php endif; ?>
 					<?php if ( ! empty( $suggestions['og_description'] ) ) : ?>
-						<div style="margin-top: 4px;">
-							<strong><?php esc_html_e( 'OG Description:', 'seomelon' ); ?></strong>
-							<?php echo esc_html( $suggestions['og_description'] ); ?>
-							<span class="seomelon-charcount seomelon-charcount-ok">
-								<?php echo esc_html( mb_strlen( $suggestions['og_description'] ) ); ?>/200
+						<div class="seomelon-og-field-group">
+							<label for="seomelon-edit-og-description"><strong><?php esc_html_e( 'OG Description:', 'seomelon' ); ?></strong></label>
+							<textarea
+								id="seomelon-edit-og-description"
+								class="seomelon-edit-field"
+								data-max-length="200"
+								data-min-length="50"
+								maxlength="220"
+								rows="2"
+								aria-describedby="seomelon-charcount-og-description"
+							><?php echo esc_textarea( $suggestions['og_description'] ); ?></textarea>
+							<?php
+							$sug_og_desc_len = mb_strlen( $suggestions['og_description'] );
+							$og_desc_class   = ( $sug_og_desc_len >= 50 && $sug_og_desc_len <= 200 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+							?>
+							<span id="seomelon-charcount-og-description" class="seomelon-charcount <?php echo esc_attr( $og_desc_class ); ?>">
+								<span class="seomelon-charcount-num"><?php echo esc_html( $sug_og_desc_len ); ?></span>/200 <?php esc_html_e( 'chars', 'seomelon' ); ?>
 							</span>
 						</div>
 					<?php endif; ?>

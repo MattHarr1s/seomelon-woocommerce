@@ -327,13 +327,19 @@ class SEOMelon_Admin {
 		}
 		update_option( 'seomelon_api_url', $api_url );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$target_locales = isset( $_POST['target_locales'] ) ? array_map( 'sanitize_text_field', (array) $_POST['target_locales'] ) : array();
+		$valid_locales  = array( 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar', 'nl', 'sv', 'pl' );
+		$target_locales = array_intersect( $target_locales, $valid_locales );
+
 		// Save settings array.
 		update_option(
 			'seomelon_settings',
 			array(
-				'content_types' => $content_types,
-				'tone'          => $tone,
-				'auto_sync'     => $auto_sync,
+				'content_types'  => $content_types,
+				'tone'           => $tone,
+				'auto_sync'      => $auto_sync,
+				'target_locales' => $target_locales,
 			)
 		);
 
@@ -426,6 +432,15 @@ class SEOMelon_Admin {
 
 		if ( is_wp_error( $suggestions ) ) {
 			wp_send_json_error( array( 'message' => $suggestions->get_error_message() ) );
+		}
+
+		// Merge user-edited fields (from the editable detail page) into suggestions.
+		$editable_keys = array( 'meta_title', 'meta_description', 'og_title', 'og_description', 'aeo_description' );
+		foreach ( $editable_keys as $key ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			if ( ! empty( $_POST[ $key ] ) ) {
+				$suggestions[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
+			}
 		}
 
 		// Categories are terms, not posts — use the term-aware apply method.

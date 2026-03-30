@@ -227,6 +227,54 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 			</table>
 		</div>
 
+		<!-- Multi-Language SEO -->
+		<div class="seomelon-settings-section">
+			<h2><?php esc_html_e( 'Multi-Language SEO', 'seomelon' ); ?> <span class="seomelon-badge seomelon-badge-blue"><?php esc_html_e( 'Advisor', 'seomelon' ); ?></span></h2>
+			<p class="description" style="margin-bottom: 12px;">
+				<?php esc_html_e( 'Generate SEO metadata in additional languages. Available on the Advisor plan.', 'seomelon' ); ?>
+			</p>
+
+			<?php
+			$available_locales = array(
+				'es' => __( 'Spanish', 'seomelon' ),
+				'fr' => __( 'French', 'seomelon' ),
+				'de' => __( 'German', 'seomelon' ),
+				'it' => __( 'Italian', 'seomelon' ),
+				'pt' => __( 'Portuguese', 'seomelon' ),
+				'ja' => __( 'Japanese', 'seomelon' ),
+				'ko' => __( 'Korean', 'seomelon' ),
+				'zh' => __( 'Chinese', 'seomelon' ),
+				'ar' => __( 'Arabic', 'seomelon' ),
+				'nl' => __( 'Dutch', 'seomelon' ),
+				'sv' => __( 'Swedish', 'seomelon' ),
+				'pl' => __( 'Polish', 'seomelon' ),
+			);
+			$selected_locales = $settings['target_locales'] ?? array();
+			?>
+
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Target Languages', 'seomelon' ); ?></th>
+					<td>
+						<fieldset>
+							<?php foreach ( $available_locales as $code => $name ) : ?>
+								<label>
+									<input type="checkbox"
+										name="target_locales[]"
+										value="<?php echo esc_attr( $code ); ?>"
+										<?php checked( in_array( $code, $selected_locales, true ) ); ?> />
+									<?php echo esc_html( $name ); ?> (<?php echo esc_html( $code ); ?>)
+								</label><br />
+							<?php endforeach; ?>
+						</fieldset>
+						<p class="description">
+							<?php esc_html_e( 'Select languages for multi-language SEO generation.', 'seomelon' ); ?>
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 		<!-- Environment Info -->
 		<div class="seomelon-settings-section">
 			<h2><?php esc_html_e( 'Environment', 'seomelon' ); ?></h2>

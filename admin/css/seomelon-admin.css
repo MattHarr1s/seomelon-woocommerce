@@ -609,6 +609,56 @@
 	background: #fff3cd;
 }
 
+.seomelon-charcount-over {
+	color: #721c24;
+	background: #f8d7da;
+}
+
+/* ==========================================================================
+   Editable Suggestion Fields
+   ========================================================================== */
+
+.seomelon-edit-field {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #1d2327;
+	background: #fff;
+	box-sizing: border-box;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.seomelon-edit-field:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.seomelon-edit-field:hover {
+	border-color: #8c8f94;
+}
+
+textarea.seomelon-edit-field {
+	resize: vertical;
+	min-height: 60px;
+}
+
+.seomelon-edit-field-wide {
+	width: 100%;
+}
+
+.seomelon-og-field-group {
+	margin-top: 12px;
+}
+
+.seomelon-og-field-group label {
+	display: block;
+	margin-bottom: 4px;
+}
+
 /* ==========================================================================
    SERP Preview
    ========================================================================== */
@@ -761,6 +811,183 @@
 	background: linear-gradient(90deg, #00a32a, #2271b1);
 	border-radius: 10px;
 	transition: width 0.3s ease;
+}
+
+/* ==========================================================================
+   Editable Fields
+   ========================================================================== */
+
+.seomelon-edit-field {
+	width: 100%;
+	padding: 6px 10px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	font-size: 14px;
+	line-height: 1.4;
+	box-sizing: border-box;
+	transition: border-color 0.15s ease;
+}
+
+.seomelon-edit-field:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.seomelon-edit-field-wide {
+	min-height: 80px;
+}
+
+.seomelon-og-field-group {
+	margin-top: 12px;
+}
+
+.seomelon-og-field-group label {
+	display: block;
+	margin-bottom: 4px;
+}
+
+.seomelon-og-field-group .seomelon-edit-field {
+	margin-top: 4px;
+}
+
+/* ==========================================================================
+   Editor Meta Box
+   ========================================================================== */
+
+.seomelon-metabox-wrap {
+	padding: 0;
+}
+
+.seomelon-metabox-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 0;
+	border-bottom: 1px solid #f0f0f1;
+	margin-bottom: 12px;
+}
+
+.seomelon-metabox-score {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.seomelon-metabox-score-label {
+	font-size: 13px;
+	color: #646970;
+}
+
+.seomelon-metabox-notice {
+	color: #646970;
+	font-style: italic;
+}
+
+.seomelon-metabox-section {
+	padding: 10px 0;
+	border-bottom: 1px solid #f6f7f7;
+}
+
+.seomelon-metabox-section:last-child {
+	border-bottom: none;
+}
+
+.seomelon-metabox-section h4 {
+	margin: 0 0 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #1d2327;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.seomelon-metabox-issues ul {
+	margin: 0;
+	list-style: none;
+	padding: 0;
+}
+
+.seomelon-metabox-issues li {
+	padding: 4px 0;
+	font-size: 13px;
+	color: #8b0000;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.seomelon-metabox-issues .dashicons {
+	color: #d63638;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.seomelon-metabox-ok {
+	color: #00a32a;
+}
+
+.seomelon-metabox-ok .dashicons {
+	color: #00a32a;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.seomelon-issue-count {
+	background: #d63638;
+	color: #fff;
+	font-size: 11px;
+	padding: 0 6px;
+	border-radius: 10px;
+	font-weight: 600;
+	line-height: 18px;
+}
+
+.seomelon-metabox-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.seomelon-metabox-table th {
+	text-align: left;
+	font-weight: 600;
+	font-size: 12px;
+	color: #646970;
+	padding: 4px 8px 4px 0;
+	width: 80px;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.seomelon-metabox-table td {
+	font-size: 13px;
+	padding: 4px 0;
+	color: #1d2327;
+	word-break: break-word;
+}
+
+.seomelon-text-muted {
+	color: #a7aaad;
+}
+
+.seomelon-serp-preview-compact {
+	padding: 10px 14px;
+	max-width: 100%;
+}
+
+.seomelon-serp-preview-compact .seomelon-serp-title {
+	font-size: 16px;
+}
+
+.seomelon-serp-preview-compact .seomelon-serp-url {
+	font-size: 12px;
+}
+
+.seomelon-serp-preview-compact .seomelon-serp-description {
+	font-size: 12px;
 }
 
 /* ==========================================================================

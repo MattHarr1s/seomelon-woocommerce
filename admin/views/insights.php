@@ -34,17 +34,33 @@ if ( $is_configured ) {
 
 // Category display labels and colors.
 $category_config = array(
+	'seo_quickwin'    => array(
+		'label' => __( 'SEO Quick Wins', 'seomelon' ),
+		'class' => 'seomelon-cat-quickwins',
+	),
 	'seo_quick_wins'  => array(
 		'label' => __( 'SEO Quick Wins', 'seomelon' ),
 		'class' => 'seomelon-cat-quickwins',
+	),
+	'keyword_gap'     => array(
+		'label' => __( 'Keyword Gaps', 'seomelon' ),
+		'class' => 'seomelon-cat-keywords',
 	),
 	'keyword_gaps'    => array(
 		'label' => __( 'Keyword Gaps', 'seomelon' ),
 		'class' => 'seomelon-cat-keywords',
 	),
+	'catalog_gap'     => array(
+		'label' => __( 'Catalog Gaps', 'seomelon' ),
+		'class' => 'seomelon-cat-catalog',
+	),
 	'catalog_gaps'    => array(
 		'label' => __( 'Catalog Gaps', 'seomelon' ),
 		'class' => 'seomelon-cat-catalog',
+	),
+	'promotion'       => array(
+		'label' => __( 'Promotions', 'seomelon' ),
+		'class' => 'seomelon-cat-promotions',
 	),
 	'promotions'      => array(
 		'label' => __( 'Promotions', 'seomelon' ),
@@ -53,6 +69,14 @@ $category_config = array(
 	'seasonal'        => array(
 		'label' => __( 'Seasonal', 'seomelon' ),
 		'class' => 'seomelon-cat-seasonal',
+	),
+	'serp_position'   => array(
+		'label' => __( 'SERP Position', 'seomelon' ),
+		'class' => 'seomelon-cat-serp',
+	),
+	'storefront_audit' => array(
+		'label' => __( 'Storefront Audit', 'seomelon' ),
+		'class' => 'seomelon-cat-audit',
 	),
 	'content'         => array(
 		'label' => __( 'Content', 'seomelon' ),

@@ -64,6 +64,13 @@ class SEOMelon {
 	public SEOMelon_Columns $columns;
 
 	/**
+	 * Editor meta box.
+	 *
+	 * @var SEOMelon_Metabox|null
+	 */
+	public ?SEOMelon_Metabox $metabox = null;
+
+	/**
 	 * Return the singleton instance.
 	 *
 	 * @return SEOMelon
@@ -87,7 +94,8 @@ class SEOMelon {
 		$this->columns    = new SEOMelon_Columns();
 
 		if ( is_admin() ) {
-			$this->admin = new SEOMelon_Admin( $this->api, $this->sync, $this->apply );
+			$this->admin   = new SEOMelon_Admin( $this->api, $this->sync, $this->apply );
+			$this->metabox = new SEOMelon_Metabox( $this->api, $this->seo_detect );
 		}
 
 		$this->register_hooks();

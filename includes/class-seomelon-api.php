@@ -162,6 +162,42 @@ class SEOMelon_API {
 	}
 
 	/**
+	 * Generate multi-language translations for content items.
+	 *
+	 * @param string   $locale         Target locale (e.g. 'es', 'fr', 'de').
+	 * @param int[]    $content_ids    Specific content IDs (optional).
+	 * @param string   $scope          'all' to generate for all content (optional).
+	 * @return array|WP_Error
+	 */
+	public function generate_translations( string $locale, array $content_ids = array(), string $scope = '' ) {
+		$body = array( 'locale' => $locale );
+
+		if ( ! empty( $content_ids ) ) {
+			$body['product_seo_ids'] = $content_ids;
+		} elseif ( 'all' === $scope ) {
+			$body['scope'] = 'all';
+		}
+
+		return $this->request( 'POST', '/translations/generate', $body );
+	}
+
+	/**
+	 * Get translations for a specific content item.
+	 *
+	 * @param int    $content_id Remote content ID.
+	 * @param string $locale     Optional specific locale.
+	 * @return array|WP_Error
+	 */
+	public function get_translations( int $content_id, string $locale = '' ) {
+		$path = '/translations/' . $content_id;
+		if ( $locale ) {
+			$path .= '/' . $locale;
+		}
+
+		return $this->request( 'GET', $path );
+	}
+
+	/**
 	 * Get SEO suggestions for a specific content item.
 	 *
 	 * The Laravel backend returns suggested_ prefixed fields.

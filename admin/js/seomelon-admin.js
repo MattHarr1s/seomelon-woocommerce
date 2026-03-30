@@ -70,6 +70,9 @@
 
 			// Clean up polling on page navigation to prevent leaked timers.
 			$(window).on('beforeunload', this.stopPoll.bind(this));
+
+			// Live character counts and preview updates for editable suggestion fields.
+			this.initEditableFields();
 		},
 
 		/* ==================================================================
@@ -247,6 +250,10 @@
 
 		/**
 		 * Apply suggestions to a single content item.
+		 *
+		 * On the detail page, collects any user-edited field values and sends
+		 * them along with the request so the backend can use those instead of
+		 * the original API suggestions.
 		 */
 		applySingle: function (e) {
 			e.preventDefault();
@@ -257,13 +264,31 @@
 			var contentType = $btn.data('content-type') || 'post';
 			var originalText = $btn.text();
 
-			$btn.prop('disabled', true).text(seomelon.i18n.applying);
-
-			this.ajax('seomelon_apply', {
+			var data = {
 				content_id: contentId,
 				post_id: postId,
 				content_type: contentType
-			}, function (response) {
+			};
+
+			// Collect edited values from detail page fields (if present).
+			var editFields = {
+				meta_title: '#seomelon-edit-meta-title',
+				meta_description: '#seomelon-edit-meta-description',
+				og_title: '#seomelon-edit-og-title',
+				og_description: '#seomelon-edit-og-description',
+				aeo_description: '#seomelon-edit-aeo-description'
+			};
+
+			$.each(editFields, function (key, selector) {
+				var $field = $(selector);
+				if ($field.length && $.trim($field.val())) {
+					data[key] = $field.val();
+				}
+			});
+
+			$btn.prop('disabled', true).text(seomelon.i18n.applying);
+
+			this.ajax('seomelon_apply', data, function (response) {
 				$btn.prop('disabled', false).text(originalText);
 				if (response.success) {
 					$btn.closest('tr').find('.seomelon-badge')
@@ -354,12 +379,18 @@
 				contentTypes.push($(this).val());
 			});
 
+			var targetLocales = [];
+			$('input[name="target_locales[]"]:checked').each(function () {
+				targetLocales.push($(this).val());
+			});
+
 			var data = {
 				api_key: $('#seomelon-api-key').val(),
 				api_url: $('#seomelon-api-url').val(),
 				content_types: contentTypes,
 				tone: $('#seomelon-tone').val(),
-				auto_sync: $('#seomelon-auto-sync').val()
+				auto_sync: $('#seomelon-auto-sync').val(),
+				target_locales: targetLocales
 			};
 
 			this.ajax('seomelon_save_settings', data, function (response) {
@@ -582,6 +613,76 @@
 			if (this.currentPage < totalPages) {
 				this.currentPage++;
 				this.paginateTable();
+			}
+		},
+
+		/* ==================================================================
+		   Editable Suggestion Fields
+		   ================================================================== */
+
+		/**
+		 * Initialize live character counts and preview updates for editable
+		 * suggestion fields on the content detail page.
+		 */
+		initEditableFields: function () {
+			var self = this;
+
+			$('.seomelon-edit-field').on('input', function () {
+				self.updateCharCount($(this));
+			});
+
+			// Update SERP preview when meta title or description changes.
+			$('#seomelon-edit-meta-title').on('input', function () {
+				var val = $(this).val().substring(0, 60);
+				$('#seomelon-serp-title').text(val);
+			});
+
+			$('#seomelon-edit-meta-description').on('input', function () {
+				var val = $(this).val().substring(0, 160);
+				$('#seomelon-serp-description').text(val);
+			});
+
+			// Update social preview when OG fields change.
+			$('#seomelon-edit-og-title').on('input', function () {
+				$('#seomelon-social-title').text($(this).val());
+			});
+
+			$('#seomelon-edit-og-description').on('input', function () {
+				$('#seomelon-social-desc').text($(this).val());
+			});
+		},
+
+		/**
+		 * Update the character count indicator for an editable field.
+		 *
+		 * Reads data-min-length and data-max-length from the field to
+		 * determine whether the count should show green, yellow, or red.
+		 *
+		 * @param {jQuery} $field The input or textarea element.
+		 */
+		updateCharCount: function ($field) {
+			var len = $field.val().length;
+			var maxLen = parseInt($field.data('max-length'), 10) || 60;
+			var minLen = parseInt($field.data('min-length'), 10) || 0;
+			var id = $field.attr('id');
+			var $counter = $('#seomelon-charcount-' + id.replace('seomelon-edit-', ''));
+
+			if (!$counter.length) {
+				return;
+			}
+
+			// Update the number.
+			$counter.find('.seomelon-charcount-num').text(len);
+
+			// Update the color class.
+			$counter.removeClass('seomelon-charcount-ok seomelon-charcount-warn seomelon-charcount-over');
+
+			if (len > maxLen) {
+				$counter.addClass('seomelon-charcount-over');
+			} else if (len >= minLen && len <= maxLen) {
+				$counter.addClass('seomelon-charcount-ok');
+			} else {
+				$counter.addClass('seomelon-charcount-warn');
 			}
 		},
 
