@@ -93,8 +93,10 @@ class SEOMelon_Admin {
 			);
 		}
 
+		$parent = SEOMelon::is_woocommerce_active() ? 'woocommerce' : 'seomelon';
+
 		add_submenu_page(
-			SEOMelon::is_woocommerce_active() ? 'woocommerce' : 'seomelon',
+			$parent,
 			__( 'SEOMelon Insights', 'seomelon' ),
 			__( 'SEOMelon Insights', 'seomelon' ),
 			$capability,
@@ -103,7 +105,16 @@ class SEOMelon_Admin {
 		);
 
 		add_submenu_page(
-			SEOMelon::is_woocommerce_active() ? 'woocommerce' : 'seomelon',
+			$parent,
+			__( 'SEOMelon Reports', 'seomelon' ),
+			__( 'SEOMelon Reports', 'seomelon' ),
+			$capability,
+			'seomelon-reports',
+			array( $this, 'render_reports' )
+		);
+
+		add_submenu_page(
+			$parent,
 			__( 'SEOMelon Settings', 'seomelon' ),
 			__( 'SEOMelon Settings', 'seomelon' ),
 			$capability,
@@ -130,9 +141,11 @@ class SEOMelon_Admin {
 		$seomelon_pages = array(
 			'woocommerce_page_seomelon',
 			'woocommerce_page_seomelon-insights',
+			'woocommerce_page_seomelon-reports',
 			'woocommerce_page_seomelon-settings',
 			'toplevel_page_seomelon',
 			'seomelon_page_seomelon-insights',
+			'seomelon_page_seomelon-reports',
 			'seomelon_page_seomelon-settings',
 		);
 
@@ -200,6 +213,17 @@ class SEOMelon_Admin {
 		}
 
 		include SEOMELON_PLUGIN_DIR . 'admin/views/insights.php';
+	}
+
+	/**
+	 * Render the reports page.
+	 */
+	public function render_reports(): void {
+		if ( ! current_user_can( SEOMelon::capability() ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'seomelon' ) );
+		}
+
+		include SEOMELON_PLUGIN_DIR . 'admin/views/reports.php';
 	}
 
 	/**
@@ -387,9 +411,11 @@ class SEOMelon_Admin {
 		$this->verify_ajax_request();
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$post_id    = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		$post_id      = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$content_id = isset( $_POST['content_id'] ) ? absint( $_POST['content_id'] ) : 0;
+		$content_id   = isset( $_POST['content_id'] ) ? absint( $_POST['content_id'] ) : 0;
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$content_type = isset( $_POST['content_type'] ) ? sanitize_text_field( wp_unslash( $_POST['content_type'] ) ) : 'post';
 
 		if ( ! $post_id || ! $content_id ) {
 			wp_send_json_error( array( 'message' => __( 'Missing post or content ID.', 'seomelon' ) ) );
@@ -402,7 +428,12 @@ class SEOMelon_Admin {
 			wp_send_json_error( array( 'message' => $suggestions->get_error_message() ) );
 		}
 
-		$applied = $this->apply->apply( $post_id, $suggestions );
+		// Categories are terms, not posts — use the term-aware apply method.
+		if ( 'category' === $content_type ) {
+			$applied = $this->apply->apply_to_term( $post_id, $suggestions );
+		} else {
+			$applied = $this->apply->apply( $post_id, $suggestions );
+		}
 
 		if ( $applied ) {
 			wp_send_json_success( array( 'message' => __( 'Suggestions applied successfully.', 'seomelon' ) ) );

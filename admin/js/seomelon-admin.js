@@ -30,6 +30,11 @@
 		maxPollAttempts: 100,
 
 		/**
+		 * Guard flag to prevent duplicate AJAX requests.
+		 */
+		isProcessing: false,
+
+		/**
 		 * Initialize all event bindings.
 		 */
 		init: function () {
@@ -37,6 +42,7 @@
 			$('#seomelon-sync-all').on('click', this.syncAll.bind(this));
 			$('#seomelon-scan-all').on('click', this.scanAll.bind(this));
 			$('#seomelon-generate-all').on('click', this.generateAll.bind(this));
+			$('#seomelon-apply-all').on('click', this.applyAll.bind(this));
 
 			// Row-level actions (delegated).
 			$(document).on('click', '.seomelon-action-generate', this.generateSingle.bind(this));
@@ -55,6 +61,13 @@
 			// Progress modal close.
 			$('#seomelon-progress-close').on('click', this.closeProgressModal.bind(this));
 
+			// Pagination.
+			this.currentPage = 1;
+			this.perPage = 20;
+			$('#seomelon-page-prev').on('click', this.prevPage.bind(this));
+			$('#seomelon-page-next').on('click', this.nextPage.bind(this));
+			this.paginateTable();
+
 			// Clean up polling on page navigation to prevent leaked timers.
 			$(window).on('beforeunload', this.stopPoll.bind(this));
 		},
@@ -68,14 +81,17 @@
 		 */
 		syncAll: function (e) {
 			e.preventDefault();
+			if (this.isProcessing) { return; }
 
 			if (!confirm(seomelon.i18n.confirm_bulk)) {
 				return;
 			}
 
+			this.isProcessing = true;
 			this.setBulkLoading(true, seomelon.i18n.syncing);
 
 			this.ajax('seomelon_sync', {}, function (response) {
+				this.isProcessing = false;
 				this.setBulkLoading(false);
 				if (response.success) {
 					this.showBulkStatus(
@@ -95,10 +111,13 @@
 		 */
 		scanAll: function (e) {
 			e.preventDefault();
+			if (this.isProcessing) { return; }
 
+			this.isProcessing = true;
 			this.setBulkLoading(true, seomelon.i18n.scanning);
 
 			this.ajax('seomelon_scan', {}, function (response) {
+				this.isProcessing = false;
 				this.setBulkLoading(false);
 				if (response.success && response.data.tracking_id) {
 					this.showProgress(seomelon.i18n.scanning, response.data.tracking_id);
@@ -116,14 +135,17 @@
 		 */
 		generateAll: function (e) {
 			e.preventDefault();
+			if (this.isProcessing) { return; }
 
 			if (!confirm(seomelon.i18n.confirm_bulk)) {
 				return;
 			}
 
+			this.isProcessing = true;
 			this.setBulkLoading(true, seomelon.i18n.generating);
 
 			this.ajax('seomelon_generate', {}, function (response) {
+				this.isProcessing = false;
 				this.setBulkLoading(false);
 				if (response.success && response.data.tracking_id) {
 					this.showProgress(seomelon.i18n.generating, response.data.tracking_id);
@@ -137,17 +159,82 @@
 		},
 
 		/**
+		 * Apply suggestions to all generated items sequentially.
+		 */
+		applyAll: function (e) {
+			e.preventDefault();
+			if (this.isProcessing) { return; }
+
+			if (!confirm(seomelon.i18n.confirm_bulk)) {
+				return;
+			}
+
+			var self = this;
+			var $rows = $('#seomelon-content-body tr');
+			var applyButtons = [];
+
+			// Collect all rows that have "Apply" buttons and generated status.
+			$rows.each(function () {
+				var $btn = $(this).find('.seomelon-action-apply');
+				if ($btn.length) {
+					applyButtons.push($btn);
+				}
+			});
+
+			if (applyButtons.length === 0) {
+				this.showBulkStatus('No items to apply.', 'error');
+				return;
+			}
+
+			self.isProcessing = true;
+			self.setBulkLoading(true, seomelon.i18n.applying);
+			var applied = 0;
+			var total = applyButtons.length;
+
+			function applyNext(index) {
+				if (index >= total) {
+					self.isProcessing = false;
+					self.setBulkLoading(false);
+					self.showBulkStatus(seomelon.i18n.success + ' ' + applied + '/' + total + ' items applied.', 'success');
+					setTimeout(function () { location.reload(); }, 1500);
+					return;
+				}
+
+				var $btn = applyButtons[index];
+				self.ajax('seomelon_apply', {
+					content_id: $btn.data('content-id'),
+					post_id: $btn.data('post-id'),
+					content_type: $btn.data('content-type') || 'post'
+				}, function (response) {
+					if (response.success) {
+						applied++;
+						$btn.closest('tr').find('.seomelon-badge')
+							.removeClass('seomelon-badge-grey seomelon-badge-blue')
+							.addClass('seomelon-badge-green')
+							.text('Applied');
+					}
+					$('#seomelon-bulk-status').text(seomelon.i18n.applying + ' ' + (index + 1) + '/' + total);
+					applyNext(index + 1);
+				});
+			}
+
+			applyNext(0);
+		},
+
+		/**
 		 * Generate AI content for a single item.
 		 */
 		generateSingle: function (e) {
 			e.preventDefault();
 			var $btn = $(e.currentTarget);
+			if ($btn.prop('disabled')) { return; }
 			var contentId = $btn.data('content-id');
+			var originalText = $btn.text();
 
 			$btn.prop('disabled', true).text(seomelon.i18n.generating);
 
 			this.ajax('seomelon_generate', { content_ids: [contentId] }, function (response) {
-				$btn.prop('disabled', false).text('Generate');
+				$btn.prop('disabled', false).text(originalText);
 				if (response.success && response.data.tracking_id) {
 					this.showProgress(seomelon.i18n.generating, response.data.tracking_id);
 				} else if (response.success) {
@@ -164,16 +251,20 @@
 		applySingle: function (e) {
 			e.preventDefault();
 			var $btn = $(e.currentTarget);
+			if ($btn.prop('disabled')) { return; }
 			var contentId = $btn.data('content-id');
 			var postId = $btn.data('post-id');
+			var contentType = $btn.data('content-type') || 'post';
+			var originalText = $btn.text();
 
 			$btn.prop('disabled', true).text(seomelon.i18n.applying);
 
 			this.ajax('seomelon_apply', {
 				content_id: contentId,
-				post_id: postId
+				post_id: postId,
+				content_type: contentType
 			}, function (response) {
-				$btn.prop('disabled', false).text('Apply');
+				$btn.prop('disabled', false).text(originalText);
 				if (response.success) {
 					$btn.closest('tr').find('.seomelon-badge')
 						.removeClass('seomelon-badge-grey seomelon-badge-blue')
@@ -308,23 +399,14 @@
 		switchContentTab: function (e) {
 			e.preventDefault();
 			var $tab = $(e.currentTarget);
-			var type = $tab.data('type');
 
 			// Update active tab.
 			$tab.siblings().removeClass('nav-tab-active');
 			$tab.addClass('nav-tab-active');
 
-			// Filter table rows.
-			var $rows = $('#seomelon-content-body tr');
-
-			if (type === 'all') {
-				$rows.show();
-			} else {
-				$rows.each(function () {
-					var rowType = $(this).data('content-type');
-					$(this).toggle(rowType === type);
-				});
-			}
+			// Reset to page 1 and re-paginate.
+			this.currentPage = 1;
+			this.paginateTable();
 		},
 
 		/**
@@ -411,7 +493,7 @@
 						$('#seomelon-progress-fill').css('width', '100%');
 						$('#seomelon-progress-message').text(data.message || seomelon.i18n.success);
 						$('#seomelon-progress-close').show();
-					} else if (status === 'failed' || status === 'error') {
+					} else if (status === 'failed' || status === 'error' || status === 'unknown') {
 						self.stopPoll();
 						$('#seomelon-progress-message').text(data.message || seomelon.i18n.error);
 						$('#seomelon-progress-close').show();
@@ -438,6 +520,69 @@
 			$('#seomelon-progress-modal').hide();
 			this.stopPoll();
 			location.reload();
+		},
+
+		/* ==================================================================
+		   Pagination
+		   ================================================================== */
+
+		paginateTable: function () {
+			var $rows = $('#seomelon-content-body tr:visible');
+			var total = $rows.length;
+			var totalPages = Math.max(1, Math.ceil(total / this.perPage));
+			var start = (this.currentPage - 1) * this.perPage;
+			var end = start + this.perPage;
+
+			// Show/hide rows based on current page (only visible rows).
+			$('#seomelon-content-body tr').each(function (i) {
+				if ($(this).is(':visible') || $(this).data('paginated-hidden')) {
+					// Only paginate visible rows.
+				}
+			});
+
+			// Simple approach: hide all, show page slice.
+			var visibleIndex = 0;
+			$('#seomelon-content-body tr').each(function () {
+				var $row = $(this);
+				// Respect tab filtering.
+				var activeTab = $('#seomelon-content-tabs .nav-tab-active').data('type');
+				var rowType = $row.data('content-type');
+				var tabVisible = (activeTab === 'all' || !activeTab || rowType === activeTab);
+
+				if (tabVisible) {
+					if (visibleIndex >= start && visibleIndex < end) {
+						$row.show();
+					} else {
+						$row.hide();
+					}
+					visibleIndex++;
+				} else {
+					$row.hide();
+				}
+			});
+
+			// Update page display.
+			$('#seomelon-page-display').text(this.currentPage + ' / ' + totalPages);
+			$('#seomelon-page-prev').prop('disabled', this.currentPage <= 1);
+			$('#seomelon-page-next').prop('disabled', this.currentPage >= totalPages);
+		},
+
+		prevPage: function (e) {
+			e.preventDefault();
+			if (this.currentPage > 1) {
+				this.currentPage--;
+				this.paginateTable();
+			}
+		},
+
+		nextPage: function (e) {
+			e.preventDefault();
+			var $rows = $('#seomelon-content-body tr');
+			var totalPages = Math.max(1, Math.ceil($rows.length / this.perPage));
+			if (this.currentPage < totalPages) {
+				this.currentPage++;
+				this.paginateTable();
+			}
 		},
 
 		/* ==================================================================

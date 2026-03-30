@@ -59,19 +59,30 @@ if ( $is_configured ) {
 	</h1>
 
 	<?php if ( ! $is_configured ) : ?>
-		<div class="notice notice-warning">
-			<p>
-				<?php
-				printf(
-					/* translators: %s: settings page URL */
-					wp_kses(
-						__( 'SEOMelon is not configured yet. Please <a href="%s">add your API key</a> to get started.', 'seomelon' ),
-						array( 'a' => array( 'href' => array() ) )
-					),
-					esc_url( admin_url( 'admin.php?page=seomelon-settings' ) )
-				);
-				?>
-			</p>
+		<div class="seomelon-onboarding">
+			<div class="seomelon-onboarding-card">
+				<h2><?php esc_html_e( 'Welcome to SEOMelon! 🍈', 'seomelon' ); ?></h2>
+				<p><?php esc_html_e( 'Get started in 3 easy steps to optimize your SEO with AI:', 'seomelon' ); ?></p>
+				<ol class="seomelon-onboarding-steps">
+					<li class="seomelon-step-active">
+						<strong><?php esc_html_e( 'Connect your API key', 'seomelon' ); ?></strong>
+						<span><?php esc_html_e( 'Register or add your key in Settings', 'seomelon' ); ?></span>
+					</li>
+					<li>
+						<strong><?php esc_html_e( 'Sync & Scan your content', 'seomelon' ); ?></strong>
+						<span><?php esc_html_e( 'SEOMelon will analyze your products, posts, and pages', 'seomelon' ); ?></span>
+					</li>
+					<li>
+						<strong><?php esc_html_e( 'Generate & Apply AI SEO', 'seomelon' ); ?></strong>
+						<span><?php esc_html_e( 'Review suggestions and apply with one click', 'seomelon' ); ?></span>
+					</li>
+				</ol>
+				<p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seomelon-settings' ) ); ?>" class="button button-primary button-hero">
+						<?php esc_html_e( 'Go to Settings', 'seomelon' ); ?>
+					</a>
+				</p>
+			</div>
 		</div>
 	<?php else : ?>
 
@@ -132,6 +143,10 @@ if ( $is_configured ) {
 			<button type="button" class="button" id="seomelon-generate-all">
 				<span class="dashicons dashicons-admin-generic"></span>
 				<?php esc_html_e( 'Generate All', 'seomelon' ); ?>
+			</button>
+			<button type="button" class="button" id="seomelon-apply-all">
+				<span class="dashicons dashicons-yes-alt"></span>
+				<?php esc_html_e( 'Apply All', 'seomelon' ); ?>
 			</button>
 			<span class="spinner" id="seomelon-bulk-spinner"></span>
 			<span id="seomelon-bulk-status" class="seomelon-status-message"></span>
@@ -234,7 +249,8 @@ if ( $is_configured ) {
 										</button>
 										<button type="button" class="button button-small seomelon-action-apply"
 												data-content-id="<?php echo esc_attr( $item['id'] ?? '' ); ?>"
-												data-post-id="<?php echo esc_attr( $item['platform_id'] ?? '' ); ?>">
+												data-post-id="<?php echo esc_attr( $item['platform_id'] ?? '' ); ?>"
+												data-content-type="<?php echo esc_attr( $item['content_type'] ?? 'post' ); ?>">
 											<?php esc_html_e( 'Apply', 'seomelon' ); ?>
 										</button>
 									</td>
@@ -263,6 +279,32 @@ if ( $is_configured ) {
 				</tbody>
 			</table>
 		</div>
+
+		<!-- Pagination -->
+		<?php
+		$items_array  = ( ! is_wp_error( $content ) && is_array( $content ) ) ? ( $content['items'] ?? $content['data'] ?? $content ) : array();
+		$total_items  = is_array( $items_array ) ? count( $items_array ) : 0;
+		$per_page     = 20;
+		$total_pages  = max( 1, (int) ceil( $total_items / $per_page ) );
+		?>
+		<?php if ( $total_items > $per_page ) : ?>
+			<div class="seomelon-pagination">
+				<span class="seomelon-pagination-info">
+					<?php
+					printf(
+						/* translators: %d: total items count */
+						esc_html__( 'Showing %d items', 'seomelon' ),
+						$total_items
+					);
+					?>
+				</span>
+				<div class="seomelon-pagination-links" id="seomelon-pagination">
+					<button type="button" class="button" data-page="prev" id="seomelon-page-prev">&laquo; <?php esc_html_e( 'Prev', 'seomelon' ); ?></button>
+					<span class="button disabled" id="seomelon-page-display">1 / <?php echo esc_html( $total_pages ); ?></span>
+					<button type="button" class="button" data-page="next" id="seomelon-page-next"><?php esc_html_e( 'Next', 'seomelon' ); ?> &raquo;</button>
+				</div>
+			</div>
+		<?php endif; ?>
 
 		<!-- Job Progress Modal -->
 		<div id="seomelon-progress-modal" class="seomelon-modal" style="display:none;">

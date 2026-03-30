@@ -116,6 +116,52 @@ class SEOMelon_API {
 	}
 
 	/**
+	 * Get a single content item by its remote ID.
+	 *
+	 * @param int $content_id Remote content ID.
+	 * @return array|WP_Error
+	 */
+	public function get_content_by_id( int $content_id ) {
+		$cache_key = 'seomelon_content_item_' . $content_id;
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$result = $this->request( 'GET', '/content/' . $content_id );
+
+		if ( ! is_wp_error( $result ) ) {
+			set_transient( $cache_key, $result, self::CACHE_TTL );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get a single report by ID.
+	 *
+	 * @param int $report_id Remote report ID.
+	 * @return array|WP_Error
+	 */
+	public function get_report( int $report_id ) {
+		$cache_key = 'seomelon_report_' . $report_id;
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$result = $this->request( 'GET', '/reports/' . $report_id );
+
+		if ( ! is_wp_error( $result ) ) {
+			set_transient( $cache_key, $result, self::CACHE_TTL );
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Get SEO suggestions for a specific content item.
 	 *
 	 * The Laravel backend returns suggested_ prefixed fields.

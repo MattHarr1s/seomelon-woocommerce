@@ -2,8 +2,8 @@
 /**
  * Single content item detail view.
  *
- * Shows suggestions, current vs proposed SEO metadata, and apply controls
- * for an individual content item.
+ * Shows suggestions with SERP preview, character counts, current vs proposed
+ * SEO metadata, and apply controls for an individual content item.
  *
  * @package SEOMelon
  */
@@ -17,23 +17,13 @@ $item        = null;
 $suggestions = null;
 
 if ( $content_id && $api->is_configured() ) {
-	$content_result = $api->get_content();
+	// Use the single-item endpoint instead of fetching all content.
+	$content_result = $api->get_content_by_id( $content_id );
 	if ( ! is_wp_error( $content_result ) ) {
-		// Laravel returns { items: [...] }.
-		$items = $content_result['items'] ?? $content_result['data'] ?? $content_result;
-		if ( is_array( $items ) ) {
-			foreach ( $items as $c ) {
-				if ( (int) ( $c['id'] ?? 0 ) === $content_id ) {
-					$item = $c;
-					break;
-				}
-			}
-		}
+		$item = $content_result['item'] ?? $content_result;
 	}
 
 	if ( $item ) {
-		// Suggestions are already normalized by the API client
-		// (meta_title, meta_description, faq_schema, etc.)
 		$suggestions = $api->get_suggestions( $content_id );
 		if ( is_wp_error( $suggestions ) ) {
 			$suggestions = null;
@@ -63,6 +53,9 @@ if ( $score >= 70 ) {
 } else {
 	$score_class = 'seomelon-score-poor';
 }
+
+$content_type = $item['content_type'] ?? 'post';
+$platform_id  = $item['platform_id'] ?? $item['shopify_product_id'] ?? '';
 ?>
 <div class="wrap seomelon-wrap">
 	<h1>
@@ -76,7 +69,7 @@ if ( $score >= 70 ) {
 	<div class="seomelon-detail-header">
 		<div class="seomelon-detail-meta">
 			<span class="seomelon-badge seomelon-badge-blue">
-				<?php echo esc_html( ucfirst( $item['content_type'] ?? '' ) ); ?>
+				<?php echo esc_html( ucfirst( $content_type ) ); ?>
 			</span>
 			<?php if ( $score > 0 ) : ?>
 				<span class="seomelon-score-badge seomelon-score-large <?php echo esc_attr( $score_class ); ?>">
@@ -91,7 +84,8 @@ if ( $score >= 70 ) {
 			</button>
 			<button type="button" class="button button-primary seomelon-action-apply"
 					data-content-id="<?php echo esc_attr( $content_id ); ?>"
-					data-post-id="<?php echo esc_attr( $item['platform_id'] ?? '' ); ?>">
+					data-post-id="<?php echo esc_attr( $platform_id ); ?>"
+					data-content-type="<?php echo esc_attr( $content_type ); ?>">
 				<span class="dashicons dashicons-yes"></span>
 				<?php esc_html_e( 'Apply All', 'seomelon' ); ?>
 			</button>
@@ -119,39 +113,91 @@ if ( $score >= 70 ) {
 	<?php if ( $suggestions ) : ?>
 		<div class="seomelon-detail-grid">
 
-			<!-- Meta Title -->
+			<!-- Meta Title with SERP Preview & Character Count -->
 			<div class="seomelon-detail-card">
 				<h3><?php esc_html_e( 'Meta Title', 'seomelon' ); ?></h3>
 				<div class="seomelon-comparison">
 					<div class="seomelon-current">
 						<label><?php esc_html_e( 'Current', 'seomelon' ); ?></label>
 						<p><?php echo esc_html( $item['current_meta_title'] ?? '(empty)' ); ?></p>
+						<?php
+						$current_title_len = mb_strlen( $item['current_meta_title'] ?? '' );
+						$title_class       = ( $current_title_len >= 30 && $current_title_len <= 60 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+						?>
+						<span class="seomelon-charcount <?php echo esc_attr( $title_class ); ?>">
+							<?php echo esc_html( $current_title_len ); ?>/60 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+						</span>
 					</div>
 					<?php if ( ! empty( $suggestions['meta_title'] ) ) : ?>
 						<div class="seomelon-suggested">
 							<label><?php esc_html_e( 'Suggested', 'seomelon' ); ?></label>
 							<p><?php echo esc_html( $suggestions['meta_title'] ); ?></p>
+							<?php
+							$sug_title_len = mb_strlen( $suggestions['meta_title'] );
+							$sug_class     = ( $sug_title_len >= 30 && $sug_title_len <= 60 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+							?>
+							<span class="seomelon-charcount <?php echo esc_attr( $sug_class ); ?>">
+								<?php echo esc_html( $sug_title_len ); ?>/60 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+							</span>
 						</div>
 					<?php endif; ?>
 				</div>
 			</div>
 
-			<!-- Meta Description -->
+			<!-- Meta Description with Character Count -->
 			<div class="seomelon-detail-card">
 				<h3><?php esc_html_e( 'Meta Description', 'seomelon' ); ?></h3>
 				<div class="seomelon-comparison">
 					<div class="seomelon-current">
 						<label><?php esc_html_e( 'Current', 'seomelon' ); ?></label>
 						<p><?php echo esc_html( $item['current_meta_description'] ?? '(empty)' ); ?></p>
+						<?php
+						$current_desc_len = mb_strlen( $item['current_meta_description'] ?? '' );
+						$desc_class       = ( $current_desc_len >= 70 && $current_desc_len <= 160 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+						?>
+						<span class="seomelon-charcount <?php echo esc_attr( $desc_class ); ?>">
+							<?php echo esc_html( $current_desc_len ); ?>/160 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+						</span>
 					</div>
 					<?php if ( ! empty( $suggestions['meta_description'] ) ) : ?>
 						<div class="seomelon-suggested">
 							<label><?php esc_html_e( 'Suggested', 'seomelon' ); ?></label>
 							<p><?php echo esc_html( $suggestions['meta_description'] ); ?></p>
+							<?php
+							$sug_desc_len = mb_strlen( $suggestions['meta_description'] );
+							$sug_d_class  = ( $sug_desc_len >= 70 && $sug_desc_len <= 160 ) ? 'seomelon-charcount-ok' : 'seomelon-charcount-warn';
+							?>
+							<span class="seomelon-charcount <?php echo esc_attr( $sug_d_class ); ?>">
+								<?php echo esc_html( $sug_desc_len ); ?>/160 <?php esc_html_e( 'chars', 'seomelon' ); ?>
+							</span>
 						</div>
 					<?php endif; ?>
 				</div>
 			</div>
+
+			<!-- SERP Preview -->
+			<?php if ( ! empty( $suggestions['meta_title'] ) && ! empty( $suggestions['meta_description'] ) ) : ?>
+				<div class="seomelon-detail-card seomelon-detail-card-full">
+					<h3><?php esc_html_e( 'Google Search Preview', 'seomelon' ); ?></h3>
+					<div class="seomelon-serp-preview">
+						<div class="seomelon-serp-title">
+							<?php echo esc_html( mb_substr( $suggestions['meta_title'], 0, 60 ) ); ?>
+						</div>
+						<div class="seomelon-serp-url">
+							<?php
+							$url = $item['url'] ?? $item['handle'] ?? '';
+							if ( ! $url && ! empty( $platform_id ) ) {
+								$url = get_permalink( (int) $platform_id );
+							}
+							echo esc_html( $url ?: home_url( '/' . ( $item['handle'] ?? '' ) ) );
+							?>
+						</div>
+						<div class="seomelon-serp-description">
+							<?php echo esc_html( mb_substr( $suggestions['meta_description'], 0, 160 ) ); ?>
+						</div>
+					</div>
+				</div>
+			<?php endif; ?>
 
 			<!-- AEO Description -->
 			<?php if ( ! empty( $suggestions['aeo_description'] ) ) : ?>
@@ -161,20 +207,39 @@ if ( $score >= 70 ) {
 				</div>
 			<?php endif; ?>
 
-			<!-- OG Tags -->
+			<!-- OG Tags with Social Preview -->
 			<?php if ( ! empty( $suggestions['og_title'] ) || ! empty( $suggestions['og_description'] ) ) : ?>
 				<div class="seomelon-detail-card seomelon-detail-card-full">
-					<h3><?php esc_html_e( 'Open Graph Tags', 'seomelon' ); ?></h3>
+					<h3><?php esc_html_e( 'Social Media Preview', 'seomelon' ); ?></h3>
+					<div class="seomelon-social-preview">
+						<div class="seomelon-social-card">
+							<div class="seomelon-social-domain">
+								<?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ); ?>
+							</div>
+							<div class="seomelon-social-title">
+								<?php echo esc_html( $suggestions['og_title'] ?? $suggestions['meta_title'] ?? '' ); ?>
+							</div>
+							<div class="seomelon-social-desc">
+								<?php echo esc_html( $suggestions['og_description'] ?? $suggestions['meta_description'] ?? '' ); ?>
+							</div>
+						</div>
+					</div>
 					<?php if ( ! empty( $suggestions['og_title'] ) ) : ?>
-						<div style="margin-bottom: 8px;">
+						<div style="margin-top: 12px;">
 							<strong><?php esc_html_e( 'OG Title:', 'seomelon' ); ?></strong>
 							<?php echo esc_html( $suggestions['og_title'] ); ?>
+							<span class="seomelon-charcount seomelon-charcount-ok">
+								<?php echo esc_html( mb_strlen( $suggestions['og_title'] ) ); ?>/60
+							</span>
 						</div>
 					<?php endif; ?>
 					<?php if ( ! empty( $suggestions['og_description'] ) ) : ?>
-						<div>
+						<div style="margin-top: 4px;">
 							<strong><?php esc_html_e( 'OG Description:', 'seomelon' ); ?></strong>
 							<?php echo esc_html( $suggestions['og_description'] ); ?>
+							<span class="seomelon-charcount seomelon-charcount-ok">
+								<?php echo esc_html( mb_strlen( $suggestions['og_description'] ) ); ?>/200
+							</span>
 						</div>
 					<?php endif; ?>
 				</div>

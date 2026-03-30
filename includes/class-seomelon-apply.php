@@ -138,6 +138,48 @@ class SEOMelon_Apply {
 	}
 
 	/**
+	 * Apply generated suggestions to a taxonomy term (category).
+	 *
+	 * Categories use term meta instead of post meta.
+	 *
+	 * @param int   $term_id     WordPress term ID.
+	 * @param array $suggestions Pre-fetched suggestions array.
+	 * @return bool True on success, false on failure.
+	 */
+	public function apply_to_term( int $term_id, array $suggestions = array() ): bool {
+		if ( empty( $suggestions ) ) {
+			return false;
+		}
+
+		$applied = false;
+
+		if ( ! empty( $suggestions['meta_title'] ) ) {
+			update_term_meta( $term_id, '_seomelon_meta_title', sanitize_text_field( $suggestions['meta_title'] ) );
+			$applied = true;
+		}
+
+		if ( ! empty( $suggestions['meta_description'] ) ) {
+			update_term_meta( $term_id, '_seomelon_meta_description', sanitize_textarea_field( $suggestions['meta_description'] ) );
+			$applied = true;
+		}
+
+		if ( ! empty( $suggestions['aeo_description'] ) ) {
+			update_term_meta( $term_id, '_seomelon_aeo_description', sanitize_textarea_field( $suggestions['aeo_description'] ) );
+			$applied = true;
+		}
+
+		if ( isset( $suggestions['seo_score'] ) ) {
+			update_term_meta( $term_id, '_seomelon_seo_score', absint( $suggestions['seo_score'] ) );
+		}
+
+		if ( $applied ) {
+			update_term_meta( $term_id, '_seomelon_applied_at', current_time( 'mysql' ) );
+		}
+
+		return $applied;
+	}
+
+	/**
 	 * Output JSON-LD schema markup on the front end.
 	 *
 	 * Hooked to wp_head. Only outputs on singular pages that have
