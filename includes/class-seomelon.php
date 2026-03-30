@@ -71,6 +71,13 @@ class SEOMelon {
 	public ?SEOMelon_Metabox $metabox = null;
 
 	/**
+	 * Frontend AEO content handler.
+	 *
+	 * @var SEOMelon_Frontend
+	 */
+	public SEOMelon_Frontend $frontend;
+
+	/**
 	 * Return the singleton instance.
 	 *
 	 * @return SEOMelon
@@ -92,6 +99,9 @@ class SEOMelon {
 		$this->sync       = new SEOMelon_Sync( $this->api, $this->seo_detect );
 		$this->apply      = new SEOMelon_Apply( $this->api, $this->seo_detect );
 		$this->columns    = new SEOMelon_Columns();
+
+		// Frontend AEO content injection (runs on all page loads).
+		$this->frontend = new SEOMelon_Frontend();
 
 		if ( is_admin() ) {
 			$this->admin   = new SEOMelon_Admin( $this->api, $this->sync, $this->apply );

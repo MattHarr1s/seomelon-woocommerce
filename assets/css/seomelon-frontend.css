@@ -1,0 +1,131 @@
+/**
+ * SEOMelon Frontend Styles
+ *
+ * Minimal, theme-agnostic styles for FAQ accordions and AEO descriptions.
+ * Uses native <details>/<summary> for zero-JS accordion behavior.
+ * Designed to blend with any WordPress theme.
+ *
+ * @package SEOMelon
+ */
+
+/* ==========================================================================
+   FAQ Section
+   ========================================================================== */
+
+.seomelon-faq-section {
+	margin: 2em 0;
+	max-width: 800px;
+}
+
+.seomelon-faq-heading {
+	font-size: 1.4em;
+	margin-bottom: 0.75em;
+}
+
+.seomelon-faq-item {
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	margin-bottom: 8px;
+	overflow: hidden;
+	transition: box-shadow 0.2s ease;
+}
+
+.seomelon-faq-item:hover {
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seomelon-faq-item[open] {
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.seomelon-faq-question {
+	padding: 14px 18px;
+	font-weight: 600;
+	font-size: 1em;
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* Remove default marker in all browsers */
+.seomelon-faq-question::-webkit-details-marker {
+	display: none;
+}
+
+.seomelon-faq-question::marker {
+	content: '';
+}
+
+/* Custom chevron indicator */
+.seomelon-faq-question::after {
+	content: '';
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate(45deg);
+	transition: transform 0.2s ease;
+	flex-shrink: 0;
+	margin-left: 12px;
+	opacity: 0.5;
+}
+
+.seomelon-faq-item[open] > .seomelon-faq-question::after {
+	transform: rotate(-135deg);
+}
+
+.seomelon-faq-answer {
+	padding: 0 18px 16px;
+	font-size: 0.95em;
+	line-height: 1.7;
+	color: inherit;
+	opacity: 0.85;
+}
+
+.seomelon-faq-answer p:last-child {
+	margin-bottom: 0;
+}
+
+/* ==========================================================================
+   AEO Description
+   ========================================================================== */
+
+.seomelon-aeo-section {
+	margin: 1.5em 0;
+	max-width: 800px;
+}
+
+.seomelon-aeo-description {
+	font-size: 0.95em;
+	line-height: 1.7;
+	color: inherit;
+	opacity: 0.9;
+}
+
+.seomelon-aeo-description p:last-child {
+	margin-bottom: 0;
+}
+
+/* ==========================================================================
+   WooCommerce Integration
+   ========================================================================== */
+
+/* Ensure FAQ tab content inherits WooCommerce styling */
+.woocommerce-Tabs-panel .seomelon-faq-section {
+	margin: 0;
+}
+
+.woocommerce-Tabs-panel .seomelon-faq-heading {
+	display: none; /* WooCommerce tab title already shown */
+}
+
+/* AEO description below product tabs */
+.woocommerce div.product .seomelon-aeo-section {
+	margin: 2em 0;
+	padding: 0;
+}
