@@ -62,6 +62,9 @@ class SEOMelon_Admin {
 		add_action( 'wp_ajax_seomelon_apply', array( $this, 'ajax_apply' ) );
 		add_action( 'wp_ajax_seomelon_job_status', array( $this, 'ajax_job_status' ) );
 		add_action( 'wp_ajax_seomelon_get_content', array( $this, 'ajax_get_content' ) );
+		add_action( 'wp_ajax_seomelon_gsc_connect', array( $this, 'ajax_gsc_connect' ) );
+		add_action( 'wp_ajax_seomelon_gsc_disconnect', array( $this, 'ajax_gsc_disconnect' ) );
+		add_action( 'wp_ajax_seomelon_gsc_status', array( $this, 'ajax_gsc_status' ) );
 	}
 
 	/**
@@ -269,13 +272,14 @@ class SEOMelon_Admin {
 
 		$site_url = home_url();
 
-		$result = $this->api->register( $site_url, $email, $store_name );
+		// Use quick_connect for seamless token-based auth (no API key visible).
+		$result = $this->api->quick_connect( $site_url, $email, $store_name );
 
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}
 
-		// Save the returned API key automatically.
+		// Token is auto-saved by quick_connect(). Also handle legacy API key.
 		if ( ! empty( $result['api_key'] ) ) {
 			$this->api->set_api_key( $result['api_key'] );
 		}
@@ -492,6 +496,54 @@ class SEOMelon_Admin {
 		$this->api->flush_cache();
 
 		$result = $this->api->get_content( $type );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * AJAX: Get Google Search Console OAuth connect URL.
+	 */
+	public function ajax_gsc_connect(): void {
+		$this->verify_ajax_request();
+
+		$result = $this->api->get_gsc_connect_url();
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * AJAX: Disconnect Google Search Console.
+	 */
+	public function ajax_gsc_disconnect(): void {
+		$this->verify_ajax_request();
+
+		$result = $this->api->disconnect_gsc();
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		// Flush cached GSC data.
+		$this->api->flush_cache();
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * AJAX: Get Google Search Console connection status.
+	 */
+	public function ajax_gsc_status(): void {
+		$this->verify_ajax_request();
+
+		$result = $this->api->get_gsc_status();
 
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );

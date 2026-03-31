@@ -54,6 +54,10 @@
 			$('#seomelon-toggle-key').on('click', this.toggleApiKey.bind(this));
 			$('#seomelon-register').on('click', this.registerSite.bind(this));
 
+			// Google Search Console.
+			$('#seomelon-gsc-connect').on('click', this.gscConnect.bind(this));
+			$('#seomelon-gsc-disconnect').on('click', this.gscDisconnect.bind(this));
+
 			// Tab switching.
 			$('#seomelon-content-tabs').on('click', '.nav-tab', this.switchContentTab.bind(this));
 			$('#seomelon-insight-tabs').on('click', '.nav-tab', this.switchInsightTab.bind(this));
@@ -418,6 +422,78 @@
 
 			$(e.currentTarget).find('.dashicons')
 				.toggleClass('dashicons-visibility dashicons-hidden');
+		},
+
+		/* ==================================================================
+		   Google Search Console
+		   ================================================================== */
+
+		/**
+		 * Connect Google Search Console via OAuth.
+		 *
+		 * Opens the Google authorization URL in a new tab. Once the user
+		 * completes authorization, they return to the Settings page.
+		 */
+		gscConnect: function (e) {
+			e.preventDefault();
+			var self = this;
+
+			$('#seomelon-gsc-spinner').addClass('is-active');
+			$('#seomelon-gsc-result').text('').removeClass('success error');
+
+			this.ajax('seomelon_gsc_connect', {}, function (response) {
+				$('#seomelon-gsc-spinner').removeClass('is-active');
+				if (response.success && response.data.url) {
+					window.open(response.data.url, '_blank', 'width=600,height=700');
+					$('#seomelon-gsc-result')
+						.text('Complete sign-in in the new window. This page will refresh.')
+						.addClass('success');
+
+					// Poll for connection status.
+					var pollCount = 0;
+					var maxPolls = 60; // 3s * 60 = 3 minutes.
+					var pollTimer = setInterval(function () {
+						pollCount++;
+						if (pollCount > maxPolls) {
+							clearInterval(pollTimer);
+							$('#seomelon-gsc-result')
+								.text('Connection check timed out. Please refresh this page.')
+								.addClass('error');
+							return;
+						}
+
+						self.ajax('seomelon_gsc_status', {}, function (statusResponse) {
+							if (statusResponse.success && statusResponse.data.connected) {
+								clearInterval(pollTimer);
+								location.reload();
+							}
+						});
+					}, 3000);
+				} else {
+					$('#seomelon-gsc-result')
+						.text(response.data.message || seomelon.i18n.error)
+						.addClass('error');
+				}
+			});
+		},
+
+		/**
+		 * Disconnect Google Search Console.
+		 */
+		gscDisconnect: function (e) {
+			e.preventDefault();
+
+			if (!confirm('Disconnect Google Search Console? You will stop receiving search performance data.')) {
+				return;
+			}
+
+			this.ajax('seomelon_gsc_disconnect', {}, function (response) {
+				if (response.success) {
+					location.reload();
+				} else {
+					alert(response.data.message || seomelon.i18n.error);
+				}
+			});
 		},
 
 		/* ==================================================================

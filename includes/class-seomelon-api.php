@@ -67,6 +67,44 @@ class SEOMelon_API {
 	}
 
 	/**
+	 * Quick Connect: register or connect in one step.
+	 *
+	 * Returns a Passport access token — no API key visible to the user.
+	 * Falls back to the legacy /auth/register if /connect is unavailable.
+	 *
+	 * @param string $site_url   The WordPress site URL.
+	 * @param string $email      Admin email address.
+	 * @param string $store_name Optional store name.
+	 * @return array|WP_Error
+	 */
+	public function quick_connect( string $site_url, string $email, string $store_name = '' ) {
+		$platform = SEOMelon::is_woocommerce_active() ? 'woocommerce' : 'wordpress';
+
+		$data = array(
+			'site_url'   => $site_url,
+			'email'      => $email,
+			'platform'   => $platform,
+			'store_name' => $store_name,
+		);
+
+		$result = $this->request_unauthenticated( 'POST', '/connect', $data );
+
+		if ( is_wp_error( $result ) ) {
+			// Fall back to legacy registration
+			return $this->register( $site_url, $email, $store_name );
+		}
+
+		// Store the access token (Passport token or API key)
+		if ( ! empty( $result['access_token'] ) ) {
+			$this->set_api_key( $result['access_token'] );
+		} elseif ( ! empty( $result['api_key'] ) ) {
+			$this->set_api_key( $result['api_key'] );
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Verify the API connection and return account details.
 	 *
 	 * @return array|WP_Error
@@ -349,6 +387,66 @@ class SEOMelon_API {
 		}
 
 		$result = $this->request( 'GET', '/reports' );
+
+		if ( ! is_wp_error( $result ) ) {
+			set_transient( $cache_key, $result, self::CACHE_TTL );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get the Google Search Console OAuth connect URL.
+	 *
+	 * @return array|WP_Error Response with 'url' key on success.
+	 */
+	public function get_gsc_connect_url() {
+		return $this->request( 'POST', '/gsc/connect-url' );
+	}
+
+	/**
+	 * Exchange an OAuth authorization code for GSC tokens.
+	 *
+	 * @param string $code Authorization code from Google OAuth callback.
+	 * @return array|WP_Error
+	 */
+	public function gsc_callback( string $code ) {
+		return $this->request( 'POST', '/gsc/callback', array( 'code' => $code ) );
+	}
+
+	/**
+	 * Get the current GSC connection status.
+	 *
+	 * @return array|WP_Error Response with 'connected', 'site_url', 'connected_at'.
+	 */
+	public function get_gsc_status() {
+		return $this->request( 'GET', '/gsc/status' );
+	}
+
+	/**
+	 * Disconnect Google Search Console.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function disconnect_gsc() {
+		return $this->request( 'POST', '/gsc/disconnect' );
+	}
+
+	/**
+	 * Get GSC performance data (impressions, clicks, queries).
+	 *
+	 * @param int $days Number of days of data to retrieve (default 30).
+	 * @return array|WP_Error Performance data on success.
+	 */
+	public function get_gsc_performance( int $days = 30 ) {
+		$cache_key = 'seomelon_gsc_performance_' . $days;
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$result = $this->request( 'GET', '/gsc/performance?days=' . $days );
 
 		if ( ! is_wp_error( $result ) ) {
 			set_transient( $cache_key, $result, self::CACHE_TTL );

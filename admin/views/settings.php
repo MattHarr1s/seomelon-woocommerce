@@ -275,6 +275,78 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 			</table>
 		</div>
 
+		<!-- Google Search Console -->
+		<div class="seomelon-settings-section">
+			<h2><?php esc_html_e( 'Google Search Console', 'seomelon' ); ?></h2>
+			<p class="description" style="margin-bottom: 12px;">
+				<?php esc_html_e( 'Connect your Google Search Console to track real search performance for your content.', 'seomelon' ); ?>
+			</p>
+
+			<?php
+			$gsc_status    = null;
+			$gsc_connected = false;
+			if ( $api_key ) {
+				$gsc_status = seomelon()->api->get_gsc_status();
+				if ( ! is_wp_error( $gsc_status ) ) {
+					$gsc_connected = ! empty( $gsc_status['connected'] );
+				}
+			}
+			?>
+
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Status', 'seomelon' ); ?></th>
+					<td>
+						<?php if ( $gsc_connected ) : ?>
+							<div id="seomelon-gsc-status">
+								<span class="seomelon-badge seomelon-badge-green"><?php esc_html_e( 'Connected', 'seomelon' ); ?></span>
+								<?php if ( ! empty( $gsc_status['site_url'] ) ) : ?>
+									<span style="margin-left: 8px;">
+										<?php
+										printf(
+											/* translators: %s: site URL connected to GSC */
+											esc_html__( 'Site: %s', 'seomelon' ),
+											'<strong id="seomelon-gsc-url">' . esc_html( $gsc_status['site_url'] ) . '</strong>'
+										);
+										?>
+									</span>
+								<?php endif; ?>
+								<?php if ( ! empty( $gsc_status['connected_at'] ) ) : ?>
+									<p class="description">
+										<?php
+										printf(
+											/* translators: %s: date the GSC was connected */
+											esc_html__( 'Connected on %s', 'seomelon' ),
+											esc_html( wp_date( get_option( 'date_format' ), strtotime( $gsc_status['connected_at'] ) ) )
+										);
+										?>
+									</p>
+								<?php endif; ?>
+								<p style="margin-top: 8px;">
+									<button type="button" class="button" id="seomelon-gsc-disconnect">
+										<span class="dashicons dashicons-no" style="vertical-align: middle;"></span>
+										<?php esc_html_e( 'Disconnect', 'seomelon' ); ?>
+									</button>
+								</p>
+							</div>
+						<?php else : ?>
+							<div id="seomelon-gsc-not-connected">
+								<p class="description" style="margin-bottom: 8px;">
+									<?php esc_html_e( 'Track impressions, clicks, and search rankings for your content.', 'seomelon' ); ?>
+								</p>
+								<button type="button" class="button button-primary" id="seomelon-gsc-connect">
+									<span class="dashicons dashicons-admin-site" style="vertical-align: middle;"></span>
+									<?php esc_html_e( 'Connect Google Search Console', 'seomelon' ); ?>
+								</button>
+								<span class="spinner" id="seomelon-gsc-spinner"></span>
+								<span id="seomelon-gsc-result" class="seomelon-status-message"></span>
+							</div>
+						<?php endif; ?>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 		<!-- Environment Info -->
 		<div class="seomelon-settings-section">
 			<h2><?php esc_html_e( 'Environment', 'seomelon' ); ?></h2>

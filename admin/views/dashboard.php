@@ -259,6 +259,78 @@ if ( $is_configured ) {
 			<?php endif; ?>
 		<?php endif; ?>
 
+		<!-- Search Performance (GSC) -->
+		<?php if ( $gamification && ! empty( $gamification['gsc_connected'] ) ) : ?>
+			<?php
+			$perf = $api->get_gsc_performance();
+			if ( ! is_wp_error( $perf ) && is_array( $perf ) ) :
+			?>
+			<div class="seomelon-performance-section" style="margin-bottom: 20px;">
+				<h3 style="margin-bottom: 12px;">
+					<span class="dashicons dashicons-chart-area" style="vertical-align: middle; margin-right: 4px;"></span>
+					<?php esc_html_e( 'Search Performance (Last 30 Days)', 'seomelon' ); ?>
+				</h3>
+				<div class="seomelon-stats-bar">
+					<div class="seomelon-stat-card">
+						<span class="seomelon-stat-label"><?php esc_html_e( 'Impressions', 'seomelon' ); ?></span>
+						<span class="seomelon-stat-value"><?php echo esc_html( number_format( $perf['total_impressions'] ?? 0 ) ); ?></span>
+					</div>
+					<div class="seomelon-stat-card">
+						<span class="seomelon-stat-label"><?php esc_html_e( 'Clicks', 'seomelon' ); ?></span>
+						<span class="seomelon-stat-value seomelon-text-green"><?php echo esc_html( number_format( $perf['total_clicks'] ?? 0 ) ); ?></span>
+					</div>
+					<div class="seomelon-stat-card">
+						<span class="seomelon-stat-label"><?php esc_html_e( 'Avg CTR', 'seomelon' ); ?></span>
+						<span class="seomelon-stat-value"><?php echo esc_html( round( $perf['avg_ctr'] ?? 0, 1 ) ); ?>%</span>
+					</div>
+					<div class="seomelon-stat-card">
+						<span class="seomelon-stat-label"><?php esc_html_e( 'Avg Position', 'seomelon' ); ?></span>
+						<span class="seomelon-stat-value"><?php echo esc_html( round( $perf['avg_position'] ?? 0, 1 ) ); ?></span>
+					</div>
+				</div>
+				<?php if ( ! empty( $perf['top_queries'] ) ) : ?>
+				<table class="wp-list-table widefat fixed striped" style="margin-top: 12px;">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Query', 'seomelon' ); ?></th>
+							<th style="width: 100px; text-align: right;"><?php esc_html_e( 'Impressions', 'seomelon' ); ?></th>
+							<th style="width: 80px; text-align: right;"><?php esc_html_e( 'Clicks', 'seomelon' ); ?></th>
+							<th style="width: 80px; text-align: right;"><?php esc_html_e( 'CTR', 'seomelon' ); ?></th>
+							<th style="width: 80px; text-align: right;"><?php esc_html_e( 'Position', 'seomelon' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php foreach ( array_slice( $perf['top_queries'], 0, 10 ) as $q ) : ?>
+						<tr>
+							<td><?php echo esc_html( $q['query'] ?? '' ); ?></td>
+							<td style="text-align: right;"><?php echo esc_html( number_format( $q['impressions'] ?? 0 ) ); ?></td>
+							<td style="text-align: right;"><?php echo esc_html( $q['clicks'] ?? 0 ); ?></td>
+							<td style="text-align: right;"><?php echo esc_html( round( $q['ctr'] ?? 0, 1 ) ); ?>%</td>
+							<td style="text-align: right;"><?php echo esc_html( round( $q['avg_position'] ?? 0, 1 ) ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					</tbody>
+				</table>
+				<?php endif; ?>
+			</div>
+			<?php endif; ?>
+		<?php elseif ( $gamification && empty( $gamification['gsc_connected'] ) ) : ?>
+			<div class="seomelon-performance-section" style="margin-bottom: 20px; padding: 16px; background: #f6f6f7; border-radius: 8px; text-align: center;">
+				<p style="margin: 0 0 8px;">
+					<span class="dashicons dashicons-search" style="font-size: 24px; width: 24px; height: 24px; color: #637381;"></span>
+				</p>
+				<p style="margin: 0 0 8px; font-weight: 600;">
+					<?php esc_html_e( 'Track Your Search Performance', 'seomelon' ); ?>
+				</p>
+				<p class="description" style="margin: 0 0 12px;">
+					<?php esc_html_e( 'Connect Google Search Console to see impressions, clicks, and rankings for your content.', 'seomelon' ); ?>
+				</p>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seomelon-settings' ) ); ?>" class="button button-primary">
+					<?php esc_html_e( 'Connect in Settings', 'seomelon' ); ?>
+				</a>
+			</div>
+		<?php endif; ?>
+
 		<!-- Bulk Actions -->
 		<div class="seomelon-bulk-actions">
 			<button type="button" class="button button-primary" id="seomelon-sync-all">

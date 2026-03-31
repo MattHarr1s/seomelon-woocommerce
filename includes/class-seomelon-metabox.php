@@ -167,7 +167,10 @@ class SEOMelon_Metabox {
 
 			<?php if ( ! $is_configured ) : ?>
 				<p class="seomelon-metabox-notice">
-					<?php esc_html_e( 'Connect your SEOMelon API key in Settings to scan and optimize this content.', 'seomelon' ); ?>
+					<?php esc_html_e( 'Connect to SEOMelon to scan and optimize this content.', 'seomelon' ); ?>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seomelon-settings' ) ); ?>" class="button button-small" style="margin-left: 8px;">
+						<?php esc_html_e( 'Connect', 'seomelon' ); ?>
+					</a>
 				</p>
 			<?php else : ?>
 
