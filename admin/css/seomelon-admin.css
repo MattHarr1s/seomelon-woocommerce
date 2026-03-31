@@ -814,6 +814,159 @@ textarea.seomelon-edit-field {
 }
 
 /* ==========================================================================
+   Gamification Section
+   ========================================================================== */
+
+.seomelon-gamification-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin: 16px 0;
+}
+
+.seomelon-health-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 16px;
+	flex: 1;
+	min-width: 280px;
+}
+
+.seomelon-health-score-display {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.seomelon-health-emoji {
+	font-size: 2rem;
+	line-height: 1;
+}
+
+.seomelon-health-number {
+	display: block;
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.seomelon-health-max {
+	font-size: 0.875rem;
+	font-weight: 400;
+	opacity: 0.6;
+}
+
+.seomelon-health-label {
+	display: block;
+	font-size: 12px;
+	color: #646970;
+}
+
+.seomelon-health-components {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.seomelon-health-comp {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+}
+
+.seomelon-health-comp-label {
+	width: 100px;
+	color: #646970;
+	flex-shrink: 0;
+}
+
+.seomelon-health-comp-bar {
+	flex: 1;
+	height: 6px;
+	border-radius: 3px;
+	background: #f0f0f1;
+	overflow: hidden;
+}
+
+.seomelon-health-comp-fill {
+	height: 100%;
+	border-radius: 3px;
+	transition: width 0.4s ease;
+}
+
+.seomelon-health-comp-num {
+	width: 28px;
+	text-align: right;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.seomelon-health-comp-cta {
+	font-size: 11px;
+	color: #2271b1;
+}
+
+.seomelon-streak-weather-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 200px;
+}
+
+.seomelon-weather-badge {
+	font-size: 13px;
+	color: #1d2327;
+}
+
+.seomelon-streak-badge {
+	font-size: 13px;
+	color: #1d2327;
+}
+
+.seomelon-achievements-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 16px;
+	flex: 1;
+	min-width: 280px;
+}
+
+.seomelon-achievement-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 8px;
+}
+
+.seomelon-achievement-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: #f0fdf4;
+	border: 2px solid #86efac;
+	font-size: 14px;
+	cursor: help;
+}
+
+.seomelon-achievement-locked {
+	background: #f6f6f7;
+	border-color: #dcdcde;
+	opacity: 0.5;
+	filter: grayscale(1);
+}
+
+/* ==========================================================================
    Editable Fields
    ========================================================================== */
 

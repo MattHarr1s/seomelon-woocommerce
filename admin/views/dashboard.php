@@ -14,10 +14,11 @@ $settings      = get_option( 'seomelon_settings', array() );
 $content_types = $settings['content_types'] ?? array( 'product', 'post', 'page' );
 $has_woo       = SEOMelon::is_woocommerce_active();
 
-// Fetch connection status and content from API.
-$connection = null;
-$content    = array();
-$stats      = array(
+// Fetch connection status, content, and gamification from API.
+$connection    = null;
+$content       = array();
+$gamification  = null;
+$stats         = array(
 	'total'     => 0,
 	'optimized' => 0,
 	'need_work' => 0,
@@ -49,6 +50,12 @@ if ( $is_configured ) {
 				}
 			}
 		}
+	}
+
+	// Fetch gamification data (health score, achievements, streak).
+	$gamification_result = $api->get_gamification_overview();
+	if ( ! is_wp_error( $gamification_result ) ) {
+		$gamification = $gamification_result;
 	}
 }
 ?>
@@ -129,6 +136,128 @@ if ( $is_configured ) {
 				</span>
 			</div>
 		</div>
+
+		<!-- Gamification: Health Score + Achievements + Streak -->
+		<?php if ( $gamification ) : ?>
+			<?php
+			$health = $gamification['health_score'] ?? null;
+			$achievements = $gamification['achievements'] ?? array();
+			$newly_unlocked = $gamification['newly_unlocked'] ?? array();
+			$streak_data = $gamification['streak'] ?? null;
+			$weather_data = $gamification['weather'] ?? null;
+			$health_overall = $health['overall'] ?? 0;
+
+			if ( $health_overall >= 70 ) {
+				$health_class = 'seomelon-score-good';
+				$health_emoji = '🍈';
+			} elseif ( $health_overall >= 50 ) {
+				$health_class = 'seomelon-score-ok';
+				$health_emoji = '🌱';
+			} elseif ( $health_overall > 0 ) {
+				$health_class = 'seomelon-score-poor';
+				$health_emoji = '🌰';
+			} else {
+				$health_class = 'seomelon-score-none';
+				$health_emoji = '🌰';
+			}
+			?>
+			<div class="seomelon-gamification-row">
+				<!-- Health Score -->
+				<div class="seomelon-health-card">
+					<div class="seomelon-health-score-display">
+						<span class="seomelon-health-emoji"><?php echo esc_html( $health_emoji ); ?></span>
+						<div>
+							<span class="seomelon-health-number <?php echo esc_attr( $health_class ); ?>">
+								<?php echo esc_html( round( $health_overall ) ); ?><span class="seomelon-health-max">/100</span>
+							</span>
+							<span class="seomelon-health-label"><?php esc_html_e( 'SEO Health Score', 'seomelon' ); ?></span>
+						</div>
+					</div>
+					<?php if ( $health && ! empty( $health['components'] ) ) : ?>
+						<div class="seomelon-health-components">
+							<?php foreach ( $health['components'] as $key => $comp ) : ?>
+								<?php if ( ( $comp['weight'] ?? 0 ) > 0 ) : ?>
+									<?php
+									$comp_score = $comp['score'] ?? 0;
+									$comp_color = $comp_score >= 70 ? '#00a32a' : ( $comp_score >= 50 ? '#dba617' : '#d63638' );
+									?>
+									<div class="seomelon-health-comp">
+										<span class="seomelon-health-comp-label"><?php echo esc_html( $comp['label'] ?? '' ); ?></span>
+										<div class="seomelon-health-comp-bar">
+											<div class="seomelon-health-comp-fill" style="width:<?php echo esc_attr( $comp_score ); ?>%;background:<?php echo esc_attr( $comp_color ); ?>"></div>
+										</div>
+										<span class="seomelon-health-comp-num" style="color:<?php echo esc_attr( $comp_color ); ?>"><?php echo esc_html( round( $comp_score ) ); ?></span>
+									</div>
+								<?php elseif ( 'search_visibility' === $key ) : ?>
+									<div class="seomelon-health-comp">
+										<span class="seomelon-health-comp-label"><?php echo esc_html( $comp['label'] ?? '' ); ?></span>
+										<em class="seomelon-health-comp-cta"><?php esc_html_e( 'Connect Search Console to unlock', 'seomelon' ); ?></em>
+									</div>
+								<?php endif; ?>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+				</div>
+
+				<!-- Streak + Weather -->
+				<?php if ( $streak_data || $weather_data ) : ?>
+					<div class="seomelon-streak-weather-card">
+						<?php if ( $weather_data ) : ?>
+							<span class="seomelon-weather-badge" title="<?php echo esc_attr( $weather_data['label'] ?? '' ); ?>">
+								<?php echo esc_html( $weather_data['emoji'] ?? '⛅' ); ?>
+								<?php echo esc_html( $weather_data['label'] ?? '' ); ?>
+							</span>
+						<?php endif; ?>
+						<?php if ( $streak_data ) : ?>
+							<span class="seomelon-streak-badge">
+								<?php
+								$streak_current = $streak_data['current'] ?? 0;
+								$flames = min( $streak_current, 5 );
+								echo esc_html( str_repeat( '🔥', max( $flames, 0 ) ) );
+								echo ' ' . esc_html( $streak_current ) . ' ';
+								esc_html_e( 'weeks', 'seomelon' );
+								?>
+							</span>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
+
+				<!-- Achievements -->
+				<?php if ( ! empty( $achievements ) ) : ?>
+					<?php
+					$unlocked_count = count( array_filter( $achievements, fn( $a ) => ! empty( $a['unlocked'] ) ) );
+					$total_count    = count( $achievements );
+					?>
+					<div class="seomelon-achievements-card">
+						<strong><?php echo esc_html( $unlocked_count . '/' . $total_count ); ?></strong>
+						<?php esc_html_e( 'achievements', 'seomelon' ); ?>
+						<div class="seomelon-achievement-badges">
+							<?php foreach ( $achievements as $ach ) : ?>
+								<span class="seomelon-achievement-badge <?php echo empty( $ach['unlocked'] ) ? 'seomelon-achievement-locked' : ''; ?>"
+									  title="<?php echo esc_attr( $ach['name'] . ' — ' . $ach['description'] ); ?>">
+									<?php echo esc_html( $ach['emoji'] ?? '🔒' ); ?>
+								</span>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				<?php endif; ?>
+			</div>
+
+			<?php if ( ! empty( $newly_unlocked ) ) : ?>
+				<div class="notice notice-success is-dismissible">
+					<p>
+						🎉 <?php esc_html_e( 'Achievement unlocked!', 'seomelon' ); ?>
+						<?php
+						foreach ( $achievements as $ach ) {
+							if ( in_array( $ach['id'] ?? '', $newly_unlocked, true ) ) {
+								echo ' <strong>' . esc_html( $ach['emoji'] . ' ' . $ach['name'] ) . '</strong>';
+							}
+						}
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
+		<?php endif; ?>
 
 		<!-- Bulk Actions -->
 		<div class="seomelon-bulk-actions">

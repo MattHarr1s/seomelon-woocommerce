@@ -242,6 +242,37 @@ class SEOMelon_API {
 	}
 
 	/**
+	 * Get full gamification overview (health score, achievements, streak, weather).
+	 *
+	 * @return array|WP_Error
+	 */
+	public function get_gamification_overview() {
+		$cache_key = 'seomelon_gamification';
+		$cached    = get_transient( $cache_key );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$result = $this->request( 'GET', '/gamification/overview' );
+
+		if ( ! is_wp_error( $result ) ) {
+			set_transient( $cache_key, $result, self::CACHE_TTL );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get health score with component breakdown.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function get_health_score() {
+		return $this->request( 'GET', '/gamification/health-score' );
+	}
+
+	/**
 	 * Trigger an SEO scan of synced content.
 	 *
 	 * @return array|WP_Error
