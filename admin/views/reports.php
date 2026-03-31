@@ -136,7 +136,7 @@ endif;
 ?>
 <div class="wrap seomelon-wrap">
 	<h1 class="wp-heading-inline">
-		<span class="seomelon-logo">&#127816;</span>
+		<span class="seomelon-logo">&#127817;</span>
 		<?php esc_html_e( 'SEOMelon Reports', 'seomelon' ); ?>
 	</h1>
 

@@ -18,7 +18,7 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 ?>
 <div class="wrap seomelon-wrap">
 	<h1>
-		<span class="seomelon-logo">&#127816;</span>
+		<span class="seomelon-logo">&#127817;</span>
 		<?php esc_html_e( 'SEOMelon Settings', 'seomelon' ); ?>
 	</h1>
 
