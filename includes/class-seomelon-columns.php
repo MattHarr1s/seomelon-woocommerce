@@ -43,6 +43,21 @@ class SEOMelon_Columns {
 			add_filter( 'manage_edit-product_sortable_columns', array( $this, 'sortable_column' ) );
 		}
 
+		// Register columns for all custom post types in settings.
+		$settings      = get_option( 'seomelon_settings', array() );
+		$content_types = $settings['content_types'] ?? array();
+
+		foreach ( $content_types as $type ) {
+			if ( in_array( $type, array( 'post', 'page', 'product', 'category' ), true ) ) {
+				continue; // Already handled above.
+			}
+			if ( post_type_exists( $type ) ) {
+				add_filter( "manage_edit-{$type}_columns", array( $this, 'add_column' ) );
+				add_action( "manage_{$type}_posts_custom_column", array( $this, 'render_column' ), 10, 2 );
+				add_filter( "manage_edit-{$type}_sortable_columns", array( $this, 'sortable_column' ) );
+			}
+		}
+
 		// Handle sorting by SEO score.
 		add_action( 'pre_get_posts', array( $this, 'handle_sort' ) );
 	}

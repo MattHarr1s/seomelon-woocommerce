@@ -358,26 +358,23 @@ if ( $is_configured ) {
 			<a href="#all" class="nav-tab nav-tab-active" data-type="all">
 				<?php esc_html_e( 'All', 'seomelon' ); ?>
 			</a>
-			<?php if ( $has_woo && in_array( 'product', $content_types, true ) ) : ?>
-				<a href="#products" class="nav-tab" data-type="product">
-					<?php esc_html_e( 'Products', 'seomelon' ); ?>
+			<?php
+			foreach ( $content_types as $ct ) :
+				if ( 'product' === $ct && ! $has_woo ) {
+					continue;
+				}
+				// Get the display label for the content type.
+				if ( 'category' === $ct ) {
+					$ct_label = __( 'Categories', 'seomelon' );
+				} else {
+					$pt_obj   = get_post_type_object( $ct );
+					$ct_label = $pt_obj ? $pt_obj->labels->name : ucfirst( $ct );
+				}
+				?>
+				<a href="#<?php echo esc_attr( $ct ); ?>" class="nav-tab" data-type="<?php echo esc_attr( $ct ); ?>">
+					<?php echo esc_html( $ct_label ); ?>
 				</a>
-			<?php endif; ?>
-			<?php if ( in_array( 'post', $content_types, true ) ) : ?>
-				<a href="#posts" class="nav-tab" data-type="post">
-					<?php esc_html_e( 'Posts', 'seomelon' ); ?>
-				</a>
-			<?php endif; ?>
-			<?php if ( in_array( 'page', $content_types, true ) ) : ?>
-				<a href="#pages" class="nav-tab" data-type="page">
-					<?php esc_html_e( 'Pages', 'seomelon' ); ?>
-				</a>
-			<?php endif; ?>
-			<?php if ( in_array( 'category', $content_types, true ) ) : ?>
-				<a href="#categories" class="nav-tab" data-type="category">
-					<?php esc_html_e( 'Categories', 'seomelon' ); ?>
-				</a>
-			<?php endif; ?>
+			<?php endforeach; ?>
 		</h2>
 
 		<!-- Content Table -->

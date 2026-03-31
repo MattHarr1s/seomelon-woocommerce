@@ -47,16 +47,18 @@ class SEOMelon_Metabox {
 		$settings      = get_option( 'seomelon_settings', array() );
 		$content_types = $settings['content_types'] ?? array( 'product', 'post', 'page' );
 
+		// Register on all selected post types (including custom ones).
 		$post_types = array();
-
-		if ( in_array( 'product', $content_types, true ) && SEOMelon::is_woocommerce_active() ) {
-			$post_types[] = 'product';
-		}
-		if ( in_array( 'post', $content_types, true ) ) {
-			$post_types[] = 'post';
-		}
-		if ( in_array( 'page', $content_types, true ) ) {
-			$post_types[] = 'page';
+		foreach ( $content_types as $type ) {
+			if ( 'category' === $type ) {
+				continue; // Categories are terms, not post types.
+			}
+			if ( 'product' === $type && ! SEOMelon::is_woocommerce_active() ) {
+				continue;
+			}
+			if ( post_type_exists( $type ) ) {
+				$post_types[] = $type;
+			}
 		}
 
 		foreach ( $post_types as $pt ) {

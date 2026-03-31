@@ -163,29 +163,59 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 					<th scope="row"><?php esc_html_e( 'Content Types', 'seomelon' ); ?></th>
 					<td>
 						<fieldset>
-							<?php if ( $has_woo ) : ?>
+							<?php
+							// Auto-discover all public post types.
+							$all_post_types = get_post_types(
+								array(
+									'public'  => true,
+									'show_ui' => true,
+								),
+								'objects'
+							);
+
+							// Always show built-in types first.
+							$priority_types = array( 'product', 'post', 'page' );
+
+							foreach ( $priority_types as $pt_slug ) :
+								if ( ! isset( $all_post_types[ $pt_slug ] ) ) {
+									continue;
+								}
+								$pt = $all_post_types[ $pt_slug ];
+								if ( 'product' === $pt_slug && ! $has_woo ) {
+									continue;
+								}
+								$label = 'product' === $pt_slug
+									? __( 'WooCommerce Products', 'seomelon' )
+									: $pt->labels->name;
+								?>
 								<label>
 									<input type="checkbox"
 										name="content_types[]"
-										value="product"
-										<?php checked( in_array( 'product', $content_types, true ) ); ?> />
-									<?php esc_html_e( 'WooCommerce Products', 'seomelon' ); ?>
+										value="<?php echo esc_attr( $pt_slug ); ?>"
+										<?php checked( in_array( $pt_slug, $content_types, true ) ); ?> />
+									<?php echo esc_html( $label ); ?>
 								</label><br />
-							<?php endif; ?>
-							<label>
-								<input type="checkbox"
-									name="content_types[]"
-									value="post"
-									<?php checked( in_array( 'post', $content_types, true ) ); ?> />
-								<?php esc_html_e( 'Posts', 'seomelon' ); ?>
-							</label><br />
-							<label>
-								<input type="checkbox"
-									name="content_types[]"
-									value="page"
-									<?php checked( in_array( 'page', $content_types, true ) ); ?> />
-								<?php esc_html_e( 'Pages', 'seomelon' ); ?>
-							</label><br />
+							<?php endforeach; ?>
+
+							<?php
+							// Show all custom post types (non-built-in).
+							foreach ( $all_post_types as $pt_slug => $pt ) :
+								// Skip built-in and already shown types.
+								if ( in_array( $pt_slug, array( 'product', 'post', 'page', 'attachment' ), true ) ) {
+									continue;
+								}
+								?>
+								<label>
+									<input type="checkbox"
+										name="content_types[]"
+										value="<?php echo esc_attr( $pt_slug ); ?>"
+										<?php checked( in_array( $pt_slug, $content_types, true ) ); ?> />
+									<?php echo esc_html( $pt->labels->name ); ?>
+									<span style="color: #646970; font-size: 12px;">(<?php echo esc_html( $pt_slug ); ?>)</span>
+								</label><br />
+							<?php endforeach; ?>
+
+							<!-- Categories -->
 							<label>
 								<input type="checkbox"
 									name="content_types[]"

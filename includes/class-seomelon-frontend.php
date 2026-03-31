@@ -61,7 +61,7 @@ class SEOMelon_Frontend {
 		}
 
 		// Skip WooCommerce products — they use the tab system instead.
-		if ( 'product' === get_post_type( $post_id ) ) {
+		if ( 'product' === get_post_type( $post_id ) && SEOMelon::is_woocommerce_active() ) {
 			return $content;
 		}
 

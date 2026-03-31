@@ -299,10 +299,10 @@ class SEOMelon_Admin {
 
 		$content_types = array();
 		if ( ! empty( $_POST['content_types'] ) && is_array( $_POST['content_types'] ) ) {
-			$allowed = array( 'product', 'post', 'page', 'category' );
+			// Accept any registered post type + 'category' for taxonomy.
 			foreach ( $_POST['content_types'] as $type ) {
-				$type = sanitize_text_field( wp_unslash( $type ) );
-				if ( in_array( $type, $allowed, true ) ) {
+				$type = sanitize_key( wp_unslash( $type ) );
+				if ( 'category' === $type || post_type_exists( $type ) ) {
 					$content_types[] = $type;
 				}
 			}

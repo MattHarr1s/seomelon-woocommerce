@@ -274,20 +274,15 @@ class SEOMelon_Sync {
 
 		$all_items = array();
 
-		if ( in_array( 'product', $content_types, true ) ) {
-			$all_items = array_merge( $all_items, $this->get_products() );
-		}
-
-		if ( in_array( 'post', $content_types, true ) ) {
-			$all_items = array_merge( $all_items, $this->get_posts() );
-		}
-
-		if ( in_array( 'page', $content_types, true ) ) {
-			$all_items = array_merge( $all_items, $this->get_pages() );
-		}
-
-		if ( in_array( 'category', $content_types, true ) ) {
-			$all_items = array_merge( $all_items, $this->get_categories() );
+		foreach ( $content_types as $type ) {
+			if ( 'product' === $type && SEOMelon::is_woocommerce_active() ) {
+				$all_items = array_merge( $all_items, $this->get_products() );
+			} elseif ( 'category' === $type ) {
+				$all_items = array_merge( $all_items, $this->get_categories() );
+			} elseif ( post_type_exists( $type ) ) {
+				// Generic handler for posts, pages, and any custom post type.
+				$all_items = array_merge( $all_items, $this->get_posts_by_type( $type ) );
+			}
 		}
 
 		$synced = 0;
@@ -320,50 +315,97 @@ class SEOMelon_Sync {
 	}
 
 	/**
+	 * Extract published items of any post type.
+	 *
+	 * Generic handler for posts, pages, and custom post types.
+	 *
+	 * @param string $post_type WordPress post type slug.
+	 * @param int    $limit     Maximum items to retrieve.
+	 * @return array
+	 */
+	public function get_posts_by_type( string $post_type, int $limit = 500 ): array {
+		$query = new WP_Query(
+			array(
+				'post_type'      => $post_type,
+				'post_status'    => 'publish',
+				'posts_per_page' => $limit,
+				'fields'         => 'ids',
+			)
+		);
+
+		$items = array();
+
+		foreach ( $query->posts as $post_id ) {
+			$items[] = $this->build_post_item( $post_id, $post_type );
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Build an API-ready array from any WordPress post.
+	 *
+	 * @param int    $post_id   WordPress post ID.
+	 * @param string $post_type Post type slug (used as content_type).
+	 * @return array
+	 */
+	private function build_post_item( int $post_id, string $post_type ): array {
+		$post   = get_post( $post_id );
+		$images = array();
+		$thumb  = get_the_post_thumbnail_url( $post_id, 'full' );
+
+		if ( $thumb ) {
+			$images[] = $thumb;
+		}
+
+		// Get taxonomy terms as product_type label.
+		$type_label = '';
+		$taxonomies = get_object_taxonomies( $post_type, 'objects' );
+		foreach ( $taxonomies as $tax ) {
+			if ( $tax->hierarchical ) {
+				$terms = wp_get_post_terms( $post_id, $tax->name, array( 'fields' => 'names' ) );
+				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+					$type_label = implode( ', ', array_slice( $terms, 0, 3 ) );
+					break;
+				}
+			}
+		}
+
+		return array(
+			'platform_id'              => $post_id,
+			'content_type'             => $post_type,
+			'title'                    => $post->post_title,
+			'description'              => wp_strip_all_tags( $post->post_content ),
+			'handle'                   => $post->post_name,
+			'product_type'             => $type_label,
+			'current_meta_title'       => $this->seo_detect->get_meta_title( $post_id ),
+			'current_meta_description' => $this->seo_detect->get_meta_description( $post_id ),
+			'images'                   => $images,
+			'url'                      => get_permalink( $post_id ),
+			'status'                   => $post->post_status,
+		);
+	}
+
+	/**
 	 * Sync a single content item by its WordPress post ID and type.
 	 *
 	 * @param int    $post_id      WordPress post ID.
-	 * @param string $content_type One of 'product', 'post', 'page'.
+	 * @param string $content_type Post type slug or 'category'.
 	 * @return array|WP_Error
 	 */
 	public function sync_single( int $post_id, string $content_type ) {
 		$item = null;
 
-		switch ( $content_type ) {
-			case 'product':
-				if ( SEOMelon::is_woocommerce_active() ) {
-					$product = wc_get_product( $post_id );
-					if ( $product ) {
-						$item = $this->build_product_item( $product );
-					}
-				}
-				break;
-
-			case 'post':
-			case 'page':
-				$post = get_post( $post_id );
-				if ( $post && $post->post_type === $content_type ) {
-					$images = array();
-					$thumb  = get_the_post_thumbnail_url( $post_id, 'full' );
-					if ( $thumb ) {
-						$images[] = $thumb;
-					}
-
-					$item = array(
-						'platform_id'              => $post_id,
-						'content_type'             => $content_type,
-						'title'                    => $post->post_title,
-						'description'              => wp_strip_all_tags( $post->post_content ),
-						'handle'                   => $post->post_name,
-						'product_type'             => '',
-						'current_meta_title'       => $this->seo_detect->get_meta_title( $post_id ),
-						'current_meta_description' => $this->seo_detect->get_meta_description( $post_id ),
-						'images'                   => $images,
-						'url'                      => get_permalink( $post_id ),
-						'status'                   => $post->post_status,
-					);
-				}
-				break;
+		if ( 'product' === $content_type && SEOMelon::is_woocommerce_active() ) {
+			$product = wc_get_product( $post_id );
+			if ( $product ) {
+				$item = $this->build_product_item( $product );
+			}
+		} elseif ( post_type_exists( $content_type ) ) {
+			$post = get_post( $post_id );
+			if ( $post && $post->post_type === $content_type ) {
+				$item = $this->build_post_item( $post_id, $content_type );
+			}
 		}
 
 		if ( null === $item ) {
