@@ -51,7 +51,7 @@ class SEOMelon_Sync {
 	 * @param int $limit Maximum products to retrieve.
 	 * @return array
 	 */
-	public function get_products( int $limit = 100 ): array {
+	public function get_products( int $limit = 500 ): array {
 		if ( ! SEOMelon::is_woocommerce_active() ) {
 			return array();
 		}
