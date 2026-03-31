@@ -28,34 +28,51 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 		<div class="seomelon-settings-section">
 			<h2><?php esc_html_e( 'API Connection', 'seomelon' ); ?></h2>
 
+			<?php
+			// Detect Passport JWT tokens (start with "eyJ") vs API keys (start with "sm_live_")
+			$is_passport = $api_key && str_starts_with( $api_key, 'eyJ' );
+			?>
+
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row">
-						<label for="seomelon-api-key"><?php esc_html_e( 'API Key', 'seomelon' ); ?></label>
+						<?php if ( $is_passport ) : ?>
+							<?php esc_html_e( 'Connection', 'seomelon' ); ?>
+						<?php else : ?>
+							<label for="seomelon-api-key"><?php esc_html_e( 'API Key', 'seomelon' ); ?></label>
+						<?php endif; ?>
 					</th>
 					<td>
-						<div class="seomelon-input-group">
-							<input type="password"
-								id="seomelon-api-key"
-								name="api_key"
-								value="<?php echo esc_attr( $api_key ); ?>"
-								class="regular-text"
-								autocomplete="off" />
-							<button type="button" class="button" id="seomelon-toggle-key" title="<?php esc_attr_e( 'Show/hide API key', 'seomelon' ); ?>">
-								<span class="dashicons dashicons-visibility"></span>
-							</button>
-						</div>
-						<p class="description">
-							<?php
-							printf(
-								/* translators: %s: SEOMelon app URL */
-								wp_kses(
-									__( 'Get your API key from %s or register below.', 'seomelon' ),
-									array( 'a' => array( 'href' => array(), 'target' => array(), 'rel' => array() ) )
-								),
-								'<a href="https://seomelon.app/settings" target="_blank" rel="noopener">seomelon.app/settings</a>'
-							);
-							?>
+						<?php if ( $is_passport ) : ?>
+							<span class="seomelon-badge seomelon-badge-green"><?php esc_html_e( 'Connected via SEOMelon', 'seomelon' ); ?></span>
+							<input type="hidden" id="seomelon-api-key" name="api_key" value="<?php echo esc_attr( $api_key ); ?>" />
+							<p class="description">
+								<?php esc_html_e( 'Your site is securely connected to SEOMelon. No API key needed.', 'seomelon' ); ?>
+							</p>
+						<?php else : ?>
+							<div class="seomelon-input-group">
+								<input type="password"
+									id="seomelon-api-key"
+									name="api_key"
+									value="<?php echo esc_attr( $api_key ); ?>"
+									class="regular-text"
+									autocomplete="off" />
+								<button type="button" class="button" id="seomelon-toggle-key" title="<?php esc_attr_e( 'Show/hide API key', 'seomelon' ); ?>">
+									<span class="dashicons dashicons-visibility"></span>
+								</button>
+							</div>
+							<p class="description">
+								<?php
+								printf(
+									/* translators: %s: SEOMelon app URL */
+									wp_kses(
+										__( 'Get your API key from %s or register below.', 'seomelon' ),
+										array( 'a' => array( 'href' => array(), 'target' => array(), 'rel' => array() ) )
+									),
+									'<a href="https://seomelon.app/settings" target="_blank" rel="noopener">seomelon.app/settings</a>'
+								);
+								?>
+						<?php endif; ?>
 						</p>
 					</td>
 				</tr>
