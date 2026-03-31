@@ -90,7 +90,7 @@ $category_config = array(
 ?>
 <div class="wrap seomelon-wrap">
 	<h1>
-		<span class="seomelon-logo">&#127849;</span>
+		<span class="seomelon-logo">&#127816;</span>
 		<?php esc_html_e( 'SEOMelon Insights', 'seomelon' ); ?>
 	</h1>
 

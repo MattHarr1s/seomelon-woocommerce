@@ -61,7 +61,7 @@ if ( $is_configured ) {
 ?>
 <div class="wrap seomelon-wrap">
 	<h1 class="wp-heading-inline">
-		<span class="seomelon-logo">&#127849;</span>
+		<span class="seomelon-logo">&#127816;</span>
 		<?php esc_html_e( 'SEOMelon Dashboard', 'seomelon' ); ?>
 	</h1>
 
