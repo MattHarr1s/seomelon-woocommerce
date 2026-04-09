@@ -87,6 +87,9 @@
 
 			// Live character counts and preview updates for editable suggestion fields.
 			this.initEditableFields();
+
+			// Show notice after Stripe checkout redirect.
+			this.handleBillingRedirect();
 		},
 
 		/* ==================================================================
@@ -402,6 +405,38 @@
 					alert((response.data && response.data.message) || 'Upgrade failed. Please try again.');
 				}
 			});
+		},
+
+		/**
+		 * Show an admin notice after returning from Stripe Checkout.
+		 */
+		handleBillingRedirect: function () {
+			var params = new URLSearchParams(window.location.search);
+			var billing = params.get('billing');
+
+			if (!billing) {
+				return;
+			}
+
+			var $wrap = $('.wrap').first();
+			var notice;
+
+			if ('success' === billing) {
+				notice = '<div class="notice notice-success is-dismissible"><p><strong>Payment successful!</strong> Your plan has been upgraded. It may take a moment for changes to appear.</p></div>';
+			} else if ('cancelled' === billing) {
+				notice = '<div class="notice notice-info is-dismissible"><p>Checkout was cancelled. You can upgrade anytime from the plan section below.</p></div>';
+			}
+
+			if (notice && $wrap.length) {
+				$wrap.find('h1').first().after(notice);
+			}
+
+			// Clean up the URL so refreshing doesn't re-show the notice.
+			if (window.history.replaceState) {
+				params.delete('billing');
+				var clean = window.location.pathname + '?' + params.toString();
+				window.history.replaceState({}, '', clean);
+			}
 		},
 
 		/**

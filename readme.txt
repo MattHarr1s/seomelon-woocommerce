@@ -3,7 +3,7 @@ Contributors: sandiasoftware
 Tags: seo, woocommerce, ai, aeo, content optimization
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.0.0
+Stable tag: 1.1.0-beta
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -83,6 +83,16 @@ Yoast SEO, Rank Math, SEOPress, and All in One SEO. The plugin automatically det
 5. SEO score column in WooCommerce products list
 
 == Changelog ==
+
+= 1.1.0-beta =
+* Stripe billing integration with 3-tier pricing (Free / Growth $24.99 / Advisor $79.99)
+* One-click connect flow (no API key copy-paste required)
+* Post-checkout success/cancel notifications
+* Plan tier synced from API to local WP options
+* Gamification: health score, achievements, streak tracking, weather status
+* Google Search Console integration
+* Multi-language SEO generation (12 languages)
+* Competitive intelligence insights
 
 = 1.0.0 =
 * Initial release

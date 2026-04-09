@@ -101,6 +101,11 @@ class SEOMelon_API {
 			$this->set_api_key( $result['api_key'] );
 		}
 
+		// Persist the plan tier locally so the settings page can display it.
+		if ( ! empty( $result['plan'] ) ) {
+			update_option( 'seomelon_plan_tier', sanitize_text_field( $result['plan'] ) );
+		}
+
 		return $result;
 	}
 
@@ -110,7 +115,14 @@ class SEOMelon_API {
 	 * @return array|WP_Error
 	 */
 	public function verify() {
-		return $this->request( 'GET', '/auth/verify' );
+		$result = $this->request( 'GET', '/auth/verify' );
+
+		// Keep local plan tier in sync with the API.
+		if ( ! is_wp_error( $result ) && ! empty( $result['plan'] ) ) {
+			update_option( 'seomelon_plan_tier', sanitize_text_field( $result['plan'] ) );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -603,7 +615,14 @@ class SEOMelon_API {
 	 * @return array|WP_Error
 	 */
 	public function get_billing_plans() {
-		return $this->request( 'GET', '/billing/plans' );
+		$result = $this->request( 'GET', '/billing/plans' );
+
+		// Keep local plan tier in sync with the API.
+		if ( ! is_wp_error( $result ) && ! empty( $result['current_plan'] ) ) {
+			update_option( 'seomelon_plan_tier', sanitize_text_field( $result['current_plan'] ) );
+		}
+
+		return $result;
 	}
 
 	/**

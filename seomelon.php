@@ -3,7 +3,7 @@
  * Plugin Name: SEOMelon - AI SEO & Business Intelligence
  * Plugin URI:  https://seomelon.app
  * Description: AI-powered SEO advisor that researches competitors, generates optimized content, and delivers business insights. Works with WooCommerce products, posts, and pages.
- * Version:     1.0.0
+ * Version:     1.1.0-beta
  * Author:      Sandia Software Services
  * Author URI:  https://seomelon.app
  * License:     GPL v2 or later
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin constants.
  */
-define( 'SEOMELON_VERSION', '1.1.0' );
+define( 'SEOMELON_VERSION', '1.1.0-beta' );
 define( 'SEOMELON_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEOMELON_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'SEOMELON_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
