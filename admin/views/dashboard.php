@@ -109,11 +109,11 @@ if ( $is_configured ) {
 				<span class="seomelon-stat-label"><?php esc_html_e( 'Plan', 'seomelon' ); ?></span>
 				<span class="seomelon-stat-value">
 					<?php
-					if ( ! is_wp_error( $connection ) && isset( $connection['plan'] ) ) {
-						echo esc_html( ucfirst( $connection['plan'] ) );
-					} else {
-						echo '&mdash;';
+					$display_plan = get_option( 'seomelon_plan_tier', '' );
+					if ( ! $display_plan && ! is_wp_error( $connection ) && isset( $connection['plan'] ) ) {
+						$display_plan = $connection['plan'];
 					}
+					echo $display_plan ? esc_html( ucfirst( $display_plan ) ) : '&mdash;';
 					?>
 				</span>
 			</div>
