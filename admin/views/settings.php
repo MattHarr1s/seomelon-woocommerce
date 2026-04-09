@@ -147,6 +147,84 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 					</tr>
 				</table>
 			</div>
+
+			<!-- Pricing / Plan -->
+			<div class="seomelon-settings-section">
+				<h2><?php esc_html_e( 'Plan', 'seomelon' ); ?></h2>
+				<div class="seomelon-pricing-cards" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+					<?php
+					$plans = array(
+						array(
+							'id'       => 'free',
+							'name'     => 'Free',
+							'price'    => '$0',
+							'period'   => '/month',
+							'badge'    => '',
+							'features' => array( '5 optimizations/month', 'SEO scoring', 'SERP preview' ),
+						),
+						array(
+							'id'       => 'growth',
+							'name'     => 'Growth',
+							'price'    => '$24.99',
+							'period'   => '/month',
+							'badge'    => 'Free during beta',
+							'features' => array( '50 optimizations/month', 'AI content generation', 'Schema + FAQ markup', 'Competitive intelligence', 'Scheduled scans' ),
+						),
+						array(
+							'id'       => 'advisor',
+							'name'     => 'Advisor',
+							'price'    => '$79.99',
+							'period'   => '/month',
+							'badge'    => 'Free during beta',
+							'features' => array( 'Unlimited optimizations', 'Answer Engine Optimization', 'Multi-language SEO (12)', 'Auto-approve mode', 'Google Search Console' ),
+						),
+					);
+
+					$current_plan = get_option( 'seomelon_plan_tier', 'free' );
+
+					foreach ( $plans as $plan ) :
+						$is_current = false;
+						if ( 'free' === $plan['id'] && in_array( $current_plan, array( 'free', '' ), true ) ) {
+							$is_current = true;
+						} elseif ( 'growth' === $plan['id'] && in_array( $current_plan, array( 'growth', 'starter', 'pro' ), true ) ) {
+							$is_current = true;
+						} elseif ( 'advisor' === $plan['id'] && in_array( $current_plan, array( 'advisor', 'premium' ), true ) ) {
+							$is_current = true;
+						}
+						?>
+						<div class="seomelon-plan-card" style="border: 1px solid <?php echo $is_current ? '#2e7d32' : '#ddd'; ?>; border-radius: 8px; padding: 20px; text-align: center; background: <?php echo $is_current ? '#f1f8e9' : '#fff'; ?>;">
+							<?php if ( $plan['badge'] ) : ?>
+								<span style="background: #ff9800; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+									<?php echo esc_html( $plan['badge'] ); ?>
+								</span>
+							<?php endif; ?>
+							<h3 style="margin: 12px 0 4px;"><?php echo esc_html( $plan['name'] ); ?></h3>
+							<div style="font-size: 28px; font-weight: 700; margin: 8px 0;">
+								<?php echo esc_html( $plan['price'] ); ?>
+								<span style="font-size: 14px; font-weight: 400; color: #666;"><?php echo esc_html( $plan['period'] ); ?></span>
+							</div>
+							<ul style="text-align: left; list-style: none; padding: 0; margin: 16px 0;">
+								<?php foreach ( $plan['features'] as $feature ) : ?>
+									<li style="padding: 4px 0; font-size: 13px;">&#10003; <?php echo esc_html( $feature ); ?></li>
+								<?php endforeach; ?>
+							</ul>
+							<?php if ( $is_current ) : ?>
+								<span class="seomelon-badge seomelon-badge-green"><?php esc_html_e( 'Current Plan', 'seomelon' ); ?></span>
+							<?php elseif ( 'free' !== $plan['id'] ) : ?>
+								<button type="button" class="button button-primary seomelon-upgrade-btn" data-plan="<?php echo esc_attr( $plan['id'] ); ?>">
+									<?php
+									/* translators: %s: plan name */
+									printf( esc_html__( 'Upgrade to %s', 'seomelon' ), esc_html( $plan['name'] ) );
+									?>
+								</button>
+							<?php endif; ?>
+						</div>
+					<?php endforeach; ?>
+				</div>
+				<p class="description" style="margin-top: 12px; text-align: center;">
+					<?php esc_html_e( 'All plans are free during beta. Upgrade now to lock in early adopter pricing.', 'seomelon' ); ?>
+				</p>
+			</div>
 		<?php endif; ?>
 
 		<!-- Content Settings -->

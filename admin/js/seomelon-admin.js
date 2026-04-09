@@ -61,6 +61,9 @@
 				$('#seomelon-advanced-connect').slideToggle(200);
 			});
 
+			// Billing upgrade buttons.
+			$(document).on('click', '.seomelon-upgrade-btn', this.upgradePlan.bind(this));
+
 			// Google Search Console.
 			$('#seomelon-gsc-connect').on('click', this.gscConnect.bind(this));
 			$('#seomelon-gsc-disconnect').on('click', this.gscDisconnect.bind(this));
@@ -373,6 +376,30 @@
 					$('#seomelon-register-result')
 						.text((response.data && response.data.message) || seomelon.i18n.error)
 						.addClass('error');
+				}
+			});
+		},
+
+		/**
+		 * Upgrade to a paid plan via Stripe Checkout.
+		 */
+		upgradePlan: function (e) {
+			e.preventDefault();
+			var $btn = $(e.currentTarget);
+			var plan = $btn.data('plan');
+
+			$btn.prop('disabled', true).text('Redirecting...');
+
+			this.ajax('seomelon_billing_checkout', { plan: plan }, function (response) {
+				if (response.success && response.data.checkout_url) {
+					window.location.href = response.data.checkout_url;
+				} else if (response.success && response.data.is_beta) {
+					// Billing not configured yet — show beta message
+					$btn.prop('disabled', false).text('Free during beta');
+					alert(response.data.error || 'All features are free during beta!');
+				} else {
+					$btn.prop('disabled', false).text('Upgrade to ' + plan.charAt(0).toUpperCase() + plan.slice(1));
+					alert((response.data && response.data.message) || 'Upgrade failed. Please try again.');
 				}
 			});
 		},

@@ -65,6 +65,7 @@ class SEOMelon_Admin {
 		add_action( 'wp_ajax_seomelon_gsc_connect', array( $this, 'ajax_gsc_connect' ) );
 		add_action( 'wp_ajax_seomelon_gsc_disconnect', array( $this, 'ajax_gsc_disconnect' ) );
 		add_action( 'wp_ajax_seomelon_gsc_status', array( $this, 'ajax_gsc_status' ) );
+		add_action( 'wp_ajax_seomelon_billing_checkout', array( $this, 'ajax_billing_checkout' ) );
 	}
 
 	/**
@@ -544,6 +545,28 @@ class SEOMelon_Admin {
 		$this->verify_ajax_request();
 
 		$result = $this->api->get_gsc_status();
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * AJAX: Create a Stripe Checkout session and return the redirect URL.
+	 */
+	public function ajax_billing_checkout(): void {
+		$this->verify_ajax_request();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$plan = isset( $_POST['plan'] ) ? sanitize_text_field( wp_unslash( $_POST['plan'] ) ) : '';
+
+		if ( ! in_array( $plan, array( 'growth', 'advisor' ), true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid plan.', 'seomelon' ) ) );
+		}
+
+		$result = $this->api->create_checkout( $plan );
 
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );

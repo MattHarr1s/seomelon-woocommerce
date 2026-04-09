@@ -594,4 +594,34 @@ class SEOMelon_API {
 
 		return $json;
 	}
+
+	// ── Billing ────────────────────────────────────────────────
+
+	/**
+	 * Get available plans and current subscription status.
+	 *
+	 * @return array|WP_Error
+	 */
+	public function get_billing_plans() {
+		return $this->request( 'GET', '/billing/plans' );
+	}
+
+	/**
+	 * Create a Stripe Checkout session for upgrading.
+	 *
+	 * @param string $plan Plan ID (growth or advisor).
+	 * @return array|WP_Error  Includes checkout_url to redirect user.
+	 */
+	public function create_checkout( string $plan ) {
+		return $this->request( 'POST', '/billing/checkout', array( 'plan' => $plan ) );
+	}
+
+	/**
+	 * Get Stripe Customer Portal URL for managing subscriptions.
+	 *
+	 * @return array|WP_Error  Includes portal_url to redirect user.
+	 */
+	public function get_billing_portal() {
+		return $this->request( 'POST', '/billing/portal' );
+	}
 }
