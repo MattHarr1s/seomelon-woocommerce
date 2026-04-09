@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin constants.
  */
-define( 'SEOMELON_VERSION', '1.0.0' );
+define( 'SEOMELON_VERSION', '1.1.0' );
 define( 'SEOMELON_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SEOMELON_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'SEOMELON_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

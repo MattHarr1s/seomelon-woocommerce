@@ -24,37 +24,63 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 
 	<div class="seomelon-settings-grid">
 
-		<!-- Connection Settings -->
-		<div class="seomelon-settings-section">
-			<h2><?php esc_html_e( 'API Connection', 'seomelon' ); ?></h2>
+		<?php
+		// Detect connection state
+		$is_passport  = $api_key && str_starts_with( $api_key, 'eyJ' );
+		$is_api_key   = $api_key && str_starts_with( $api_key, 'sm_live_' );
+		$is_connected = $is_passport || $is_api_key;
+		?>
 
-			<?php
-			// Detect Passport JWT tokens (start with "eyJ") vs API keys (start with "sm_live_")
-			$is_passport = $api_key && str_starts_with( $api_key, 'eyJ' );
-			?>
+		<?php if ( ! $is_connected ) : ?>
+			<!-- Onboarding: One-Click Connect (shown when not connected) -->
+			<div class="seomelon-settings-section seomelon-onboarding-hero">
+				<div style="text-align: center; padding: 20px 0;">
+					<h2 style="font-size: 1.5em; margin-bottom: 8px;">
+						<?php esc_html_e( 'Connect Your Store to SEOMelon', 'seomelon' ); ?>
+					</h2>
+					<p class="description" style="font-size: 14px; margin-bottom: 24px;">
+						<?php esc_html_e( 'One click to connect. We\'ll analyze your products, research your competitors, and generate optimized SEO content.', 'seomelon' ); ?>
+					</p>
 
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row">
-						<?php if ( $is_passport ) : ?>
-							<?php esc_html_e( 'Connection', 'seomelon' ); ?>
-						<?php else : ?>
+					<input type="email"
+						id="seomelon-register-email"
+						value="<?php echo esc_attr( get_option( 'admin_email', '' ) ); ?>"
+						class="regular-text"
+						placeholder="you@example.com"
+						style="max-width: 320px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;" />
+					<input type="hidden" id="seomelon-register-name" value="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" />
+
+					<button type="button" class="button button-primary button-hero" id="seomelon-register">
+						<span class="dashicons dashicons-admin-network" style="vertical-align: middle; margin-right: 4px;"></span>
+						<?php esc_html_e( 'Connect to SEOMelon — Free', 'seomelon' ); ?>
+					</button>
+					<span class="spinner" id="seomelon-register-spinner"></span>
+					<div id="seomelon-register-result" class="seomelon-status-message" style="margin-top: 12px;"></div>
+
+					<p class="description" style="margin-top: 20px; font-size: 12px; color: #888;">
+						<?php esc_html_e( 'No credit card required. Free plan includes 5 product optimizations per month.', 'seomelon' ); ?>
+						<br />
+						<a href="#" id="seomelon-show-advanced-connect" style="font-size: 12px;">
+							<?php esc_html_e( 'Advanced: enter API key manually', 'seomelon' ); ?>
+						</a>
+					</p>
+				</div>
+			</div>
+
+			<!-- Advanced Connection (hidden by default when not connected) -->
+			<div class="seomelon-settings-section" id="seomelon-advanced-connect" style="display: none;">
+				<h2><?php esc_html_e( 'Manual API Connection', 'seomelon' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row">
 							<label for="seomelon-api-key"><?php esc_html_e( 'API Key', 'seomelon' ); ?></label>
-						<?php endif; ?>
-					</th>
-					<td>
-						<?php if ( $is_passport ) : ?>
-							<span class="seomelon-badge seomelon-badge-green"><?php esc_html_e( 'Connected via SEOMelon', 'seomelon' ); ?></span>
-							<input type="hidden" id="seomelon-api-key" name="api_key" value="<?php echo esc_attr( $api_key ); ?>" />
-							<p class="description">
-								<?php esc_html_e( 'Your site is securely connected to SEOMelon. No API key needed.', 'seomelon' ); ?>
-							</p>
-						<?php else : ?>
+						</th>
+						<td>
 							<div class="seomelon-input-group">
 								<input type="password"
 									id="seomelon-api-key"
 									name="api_key"
-									value="<?php echo esc_attr( $api_key ); ?>"
+									value=""
 									class="regular-text"
 									autocomplete="off" />
 								<button type="button" class="button" id="seomelon-toggle-key" title="<?php esc_attr_e( 'Show/hide API key', 'seomelon' ); ?>">
@@ -62,92 +88,61 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 								</button>
 							</div>
 							<p class="description">
-								<?php
-								printf(
-									/* translators: %s: SEOMelon app URL */
-									wp_kses(
-										__( 'Get your API key from %s or register below.', 'seomelon' ),
-										array( 'a' => array( 'href' => array(), 'target' => array(), 'rel' => array() ) )
-									),
-									'<a href="https://seomelon.app/settings" target="_blank" rel="noopener">seomelon.app/settings</a>'
-								);
-								?>
-						<?php endif; ?>
-						</p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
-						<label for="seomelon-api-url"><?php esc_html_e( 'API URL', 'seomelon' ); ?></label>
-					</th>
-					<td>
-						<input type="url"
-							id="seomelon-api-url"
-							name="api_url"
-							value="<?php echo esc_url( $api_url ); ?>"
-							class="regular-text"
-							placeholder="https://seomelon.app/api/v1" />
-						<p class="description">
-							<?php esc_html_e( 'Default: https://seomelon.app/api/v1. Change only if self-hosting.', 'seomelon' ); ?>
-						</p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Connection Test', 'seomelon' ); ?></th>
-					<td>
-						<button type="button" class="button" id="seomelon-test-connection">
-							<span class="dashicons dashicons-yes-alt"></span>
-							<?php esc_html_e( 'Test Connection', 'seomelon' ); ?>
-						</button>
-						<span class="spinner" id="seomelon-test-spinner"></span>
-						<span id="seomelon-test-result" class="seomelon-status-message"></span>
-					</td>
-				</tr>
-			</table>
-		</div>
-
-		<!-- Quick Registration -->
-		<?php if ( empty( $api_key ) ) : ?>
-			<div class="seomelon-settings-section">
-				<h2><?php esc_html_e( 'Quick Registration', 'seomelon' ); ?></h2>
-				<p class="description" style="margin-bottom: 12px;">
-					<?php esc_html_e( 'No API key? Register your site with SEOMelon to get one automatically.', 'seomelon' ); ?>
-				</p>
-
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row">
-							<label for="seomelon-register-email"><?php esc_html_e( 'Email Address', 'seomelon' ); ?></label>
-						</th>
-						<td>
-							<input type="email"
-								id="seomelon-register-email"
-								value="<?php echo esc_attr( get_option( 'admin_email', '' ) ); ?>"
-								class="regular-text"
-								placeholder="you@example.com" />
+								<?php esc_html_e( 'Paste an API key if you already have one from another installation.', 'seomelon' ); ?>
+							</p>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="seomelon-register-name"><?php esc_html_e( 'Store Name', 'seomelon' ); ?></label>
+							<label for="seomelon-api-url"><?php esc_html_e( 'API URL', 'seomelon' ); ?></label>
 						</th>
 						<td>
-							<input type="text"
-								id="seomelon-register-name"
-								value="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>"
+							<input type="url"
+								id="seomelon-api-url"
+								name="api_url"
+								value="<?php echo esc_url( $api_url ); ?>"
 								class="regular-text"
-								placeholder="<?php esc_attr_e( 'My WordPress Site', 'seomelon' ); ?>" />
+								placeholder="https://seomelon.app/api/v1" />
+							<p class="description">
+								<?php esc_html_e( 'Change only if self-hosting.', 'seomelon' ); ?>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</div>
+		<?php else : ?>
+			<!-- Connected State -->
+			<div class="seomelon-settings-section">
+				<h2><?php esc_html_e( 'Connection', 'seomelon' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Status', 'seomelon' ); ?></th>
+						<td>
+							<span class="seomelon-badge seomelon-badge-green">
+								<?php echo $is_passport ? esc_html__( 'Connected via SEOMelon', 'seomelon' ) : esc_html__( 'Connected (API Key)', 'seomelon' ); ?>
+							</span>
+							<input type="hidden" id="seomelon-api-key" name="api_key" value="<?php echo esc_attr( $api_key ); ?>" />
+							<input type="hidden" id="seomelon-api-url" name="api_url" value="<?php echo esc_url( $api_url ); ?>" />
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Connection Test', 'seomelon' ); ?></th>
+						<td>
+							<button type="button" class="button" id="seomelon-test-connection">
+								<span class="dashicons dashicons-yes-alt"></span>
+								<?php esc_html_e( 'Test Connection', 'seomelon' ); ?>
+							</button>
+							<span class="spinner" id="seomelon-test-spinner"></span>
+							<span id="seomelon-test-result" class="seomelon-status-message"></span>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">&nbsp;</th>
 						<td>
-							<button type="button" class="button button-primary" id="seomelon-register">
-								<span class="dashicons dashicons-admin-network"></span>
-								<?php esc_html_e( 'Register & Get API Key', 'seomelon' ); ?>
+							<button type="button" class="button" id="seomelon-disconnect">
+								<span class="dashicons dashicons-dismiss" style="vertical-align: middle;"></span>
+								<?php esc_html_e( 'Disconnect', 'seomelon' ); ?>
 							</button>
-							<span class="spinner" id="seomelon-register-spinner"></span>
-							<span id="seomelon-register-result" class="seomelon-status-message"></span>
 						</td>
 					</tr>
 				</table>

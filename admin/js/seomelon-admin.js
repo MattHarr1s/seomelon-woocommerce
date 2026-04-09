@@ -53,6 +53,13 @@
 			$('#seomelon-save-settings').on('click', this.saveSettings.bind(this));
 			$('#seomelon-toggle-key').on('click', this.toggleApiKey.bind(this));
 			$('#seomelon-register').on('click', this.registerSite.bind(this));
+			$('#seomelon-disconnect').on('click', this.disconnectSite.bind(this));
+
+			// Advanced connect toggle.
+			$('#seomelon-show-advanced-connect').on('click', function (e) {
+				e.preventDefault();
+				$('#seomelon-advanced-connect').slideToggle(200);
+			});
 
 			// Google Search Console.
 			$('#seomelon-gsc-connect').on('click', this.gscConnect.bind(this));
@@ -348,24 +355,46 @@
 			}
 
 			$('#seomelon-register-spinner').addClass('is-active');
-			$('#seomelon-register-result').text(seomelon.i18n.registering).removeClass('success error');
+			$('#seomelon-register').prop('disabled', true);
+			$('#seomelon-register-result').text('Connecting...').removeClass('success error');
 
 			this.ajax('seomelon_register', {
 				email: email,
 				store_name: storeName
 			}, function (response) {
 				$('#seomelon-register-spinner').removeClass('is-active');
-				if (response.success && response.data.api_key) {
-					// Auto-fill the API key field.
-					$('#seomelon-api-key').val(response.data.api_key);
+				if (response.success) {
 					$('#seomelon-register-result')
-						.text(seomelon.i18n.success + ' API key set automatically. Click "Save Settings" to continue.')
+						.text('Connected! Reloading...')
 						.addClass('success');
+					setTimeout(function () { window.location.reload(); }, 1000);
 				} else {
+					$('#seomelon-register').prop('disabled', false);
 					$('#seomelon-register-result')
-						.text(response.data.message || seomelon.i18n.error)
+						.text((response.data && response.data.message) || seomelon.i18n.error)
 						.addClass('error');
 				}
+			});
+		},
+
+		/**
+		 * Disconnect and clear stored API token so user can reconnect.
+		 */
+		disconnectSite: function (e) {
+			e.preventDefault();
+
+			if (!confirm('Disconnect from SEOMelon? You can reconnect immediately after.')) {
+				return;
+			}
+
+			this.ajax('seomelon_save_settings', {
+				api_key: '',
+				api_url: $('#seomelon-api-url').val(),
+				content_types: [],
+				tone: 'professional',
+				auto_sync: 'manual'
+			}, function () {
+				location.reload();
 			});
 		},
 
