@@ -25,9 +25,10 @@
 		pollCount: 0,
 
 		/**
-		 * Maximum number of poll attempts before giving up (3s * 100 = 5 min).
+		 * Maximum number of poll attempts before giving up (5s * 360 = 30 min).
+		 * TinyFish-enhanced generation for 30+ products can take 15-20 minutes.
 		 */
-		maxPollAttempts: 100,
+		maxPollAttempts: 360,
 
 		/**
 		 * Guard flag to prevent duplicate AJAX requests.
@@ -697,7 +698,7 @@
 						$('#seomelon-progress-close').show();
 					}
 				});
-			}, 3000);
+			}, 5000);
 		},
 
 		/**

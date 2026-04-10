@@ -562,7 +562,7 @@ class SEOMelon_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$plan = isset( $_POST['plan'] ) ? sanitize_text_field( wp_unslash( $_POST['plan'] ) ) : '';
 
-		if ( ! in_array( $plan, array( 'growth', 'advisor' ), true ) ) {
+		if ( ! in_array( $plan, array( 'pro', 'advisor' ), true ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid plan.', 'seomelon' ) ) );
 		}
 

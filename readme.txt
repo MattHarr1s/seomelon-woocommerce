@@ -3,7 +3,7 @@ Contributors: sandiasoftware
 Tags: seo, woocommerce, ai, aeo, content optimization
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.1.0-beta
+Stable tag: 1.2.0-beta
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -83,6 +83,17 @@ Yoast SEO, Rank Math, SEOPress, and All in One SEO. The plugin automatically det
 5. SEO score column in WooCommerce products list
 
 == Changelog ==
+
+= 1.2.0-beta =
+* Manual FAQ and JSON-LD schema editor on product/post/page edit screens (free tier, limited to 10 posts)
+* Pre-filled Product schema scaffold for WooCommerce products
+* Client-side JSON-LD validation with Google Rich Results tester link
+* Pioneer Pricing launch: Pro $39/mo (standard $49) + Advisor $99/mo (standard $149), locked for life for first 200 Founding Members
+* Updated pricing cards on settings page with struck-through standard prices
+* Bumped TinyFish SSE polling timeout to 30 minutes for large product catalogs
+* Fixed duplicate backoff() method in GenerateSeoJob causing generation failures
+* Fixed KeywordExpander stale cache causing "array_slice" errors in TinyFish pipeline
+* Dashboard plan display now reads from synced local option
 
 = 1.1.0-beta =
 * Stripe billing integration with 3-tier pricing (Free / Growth $24.99 / Advisor $79.99)

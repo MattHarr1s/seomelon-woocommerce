@@ -71,6 +71,13 @@ class SEOMelon {
 	public ?SEOMelon_Metabox $metabox = null;
 
 	/**
+	 * Manual schema/FAQ editor meta box (free-tier feature).
+	 *
+	 * @var SEOMelon_Manual_Schema|null
+	 */
+	public ?SEOMelon_Manual_Schema $manual_schema = null;
+
+	/**
 	 * Frontend AEO content handler.
 	 *
 	 * @var SEOMelon_Frontend
@@ -104,8 +111,9 @@ class SEOMelon {
 		$this->frontend = new SEOMelon_Frontend();
 
 		if ( is_admin() ) {
-			$this->admin   = new SEOMelon_Admin( $this->api, $this->sync, $this->apply );
-			$this->metabox = new SEOMelon_Metabox( $this->api, $this->seo_detect );
+			$this->admin         = new SEOMelon_Admin( $this->api, $this->sync, $this->apply );
+			$this->metabox       = new SEOMelon_Metabox( $this->api, $this->seo_detect );
+			$this->manual_schema = new SEOMelon_Manual_Schema();
 		}
 
 		$this->register_hooks();

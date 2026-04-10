@@ -155,28 +155,31 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 					<?php
 					$plans = array(
 						array(
-							'id'       => 'free',
-							'name'     => 'Free',
-							'price'    => '$0',
-							'period'   => '/month',
-							'badge'    => '',
-							'features' => array( '5 optimizations/month', 'SEO scoring', 'SERP preview' ),
+							'id'            => 'free',
+							'name'          => 'Free',
+							'price'         => '$0',
+							'period'        => '/month',
+							'badge'         => '',
+							'standard_price' => null,
+							'features'      => array( '5 optimizations/month', 'SEO health scoring', 'SERP preview', 'AEO readiness audit' ),
 						),
 						array(
-							'id'       => 'growth',
-							'name'     => 'Growth',
-							'price'    => '$24.99',
-							'period'   => '/month',
-							'badge'    => 'Free during beta',
-							'features' => array( '50 optimizations/month', 'AI content generation', 'Schema + FAQ markup', 'Competitive intelligence', 'Scheduled scans' ),
+							'id'            => 'pro',
+							'name'          => 'Pro',
+							'price'         => '$39',
+							'period'        => '/month',
+							'badge'         => 'Pioneer — locked for life',
+							'standard_price' => '$49',
+							'features'      => array( '75 optimizations/month', 'All 7 AI agents', 'Schema + JSON-LD markup', 'Competitive intelligence', 'Scheduled scans' ),
 						),
 						array(
-							'id'       => 'advisor',
-							'name'     => 'Advisor',
-							'price'    => '$79.99',
-							'period'   => '/month',
-							'badge'    => 'Free during beta',
-							'features' => array( 'Unlimited optimizations', 'Answer Engine Optimization', 'Multi-language SEO (12)', 'Auto-approve mode', 'Google Search Console' ),
+							'id'            => 'advisor',
+							'name'          => 'Advisor',
+							'price'         => '$99',
+							'period'        => '/month',
+							'badge'         => 'Pioneer — locked for life',
+							'standard_price' => '$149',
+							'features'      => array( 'Unlimited optimizations', 'Answer Engine Optimization', 'Multi-language SEO (12)', 'Auto-approve mode', 'Google Search Console', 'Founding Member badge' ),
 						),
 					);
 
@@ -186,7 +189,7 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 						$is_current = false;
 						if ( 'free' === $plan['id'] && in_array( $current_plan, array( 'free', '' ), true ) ) {
 							$is_current = true;
-						} elseif ( 'growth' === $plan['id'] && in_array( $current_plan, array( 'growth', 'starter', 'pro' ), true ) ) {
+						} elseif ( 'pro' === $plan['id'] && in_array( $current_plan, array( 'pro', 'growth', 'starter' ), true ) ) {
 							$is_current = true;
 						} elseif ( 'advisor' === $plan['id'] && in_array( $current_plan, array( 'advisor', 'premium' ), true ) ) {
 							$is_current = true;
@@ -199,7 +202,10 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 								</span>
 							<?php endif; ?>
 							<h3 style="margin: 12px 0 4px;"><?php echo esc_html( $plan['name'] ); ?></h3>
-							<div style="font-size: 28px; font-weight: 700; margin: 8px 0;">
+							<?php if ( ! empty( $plan['standard_price'] ) ) : ?>
+								<div style="font-size: 13px; color: #999; text-decoration: line-through;"><?php echo esc_html( $plan['standard_price'] ); ?> /month</div>
+							<?php endif; ?>
+							<div style="font-size: 28px; font-weight: 700; margin: 4px 0 8px; color: <?php echo ! empty( $plan['standard_price'] ) ? '#2e7d32' : 'inherit'; ?>;">
 								<?php echo esc_html( $plan['price'] ); ?>
 								<span style="font-size: 14px; font-weight: 400; color: #666;"><?php echo esc_html( $plan['period'] ); ?></span>
 							</div>
@@ -222,7 +228,7 @@ $seo_plugin    = seomelon()->seo_detect->get_active_plugin_name();
 					<?php endforeach; ?>
 				</div>
 				<p class="description" style="margin-top: 12px; text-align: center;">
-					<?php esc_html_e( 'All plans are free during beta. Upgrade now to lock in early adopter pricing.', 'seomelon' ); ?>
+					<?php esc_html_e( 'Pioneer Pricing — locked for life. Limited to first 200 Founding Members.', 'seomelon' ); ?>
 				</p>
 			</div>
 		<?php endif; ?>
